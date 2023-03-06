@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tabView="clr-namespace:Syncfusion.Maui.TabView;assembly=Syncfusion.Maui.TabView"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             x:Class="BikeRide.MainPage"
+             xmlns:vm="clr-namespace:BikeRide.ViewModels"
+             x:DataType="vm:MainViewModel">
+    
+    <ContentPage.Content>
+        <tabView:SfTabView x:Name="tabView" TabBarPlacement="Bottom">
+            <tabView:SfTabView.Items TabImagePosition="Top" >
+                <tabView:SfTabItem ImageSource="home.png" >
+                    <tabView:SfTabItem.Content>
+                        <ScrollView>
+                            <Grid RowDefinitions="400,*,*" RowSpacing="15" Padding="30,25,30,0">
+                                <!-- General information. -->
+                                <Border StrokeThickness="0" StrokeShape="RoundRectangle 25">
+                                    <Border.Shadow>
+                                        <Shadow Radius="60" Opacity="0.2" />
+                                    </Border.Shadow>
+                                    <Grid RowDefinitions="55,100,45,25,100,50"
+                          VerticalOptions="Center">
+                                        <Image Source="sort" HeightRequest="24" HorizontalOptions="Start" Margin="15,0,0,0" />
+                                        <Image Source="more" HeightRequest="24" HorizontalOptions="End" Margin="0,0,15,0" />
+
+                                        <Border Grid.Row="1"
+                                StrokeThickness="0" StrokeShape="RoundRectangle 50"
+                                HorizontalOptions="Center">
+                                            <Image Source="{Binding ProfilePhotoSource}" WidthRequest="100" HeightRequest="100" Aspect="AspectFill" />
+                                        </Border>
+                                        <Label Grid.Row="2" Text="{Binding ProfileName}" FontSize="22" FontAttributes="Bold" LineBreakMode="NoWrap" TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" Padding="0,15,0,0" />
+                                        <Label Grid.Row="3" Text="{Binding ProfileDetails}" FontSize="14" TextColor="Black" HorizontalTextAlignment="Center" Padding="0,5,0,0" />
+
+                                        <Grid Grid.Row="4"
+                              RowDefinitions="20,*" ColumnDefinitions="Auto,*,Auto,*,Auto"
+                              RowSpacing="10"
+                              Padding="50,45,50,0">
+                                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding LeftTurns }" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
+                                            <Label Grid.Row="1" Grid.Column="0" Text="Left Turns" FontSize="13" HorizontalTextAlignment="Center" />
+
+                                            <Rectangle Grid.RowSpan="2" Grid.Column="1"
+                                VerticalOptions="Fill"
+                                WidthRequest="1"
+                                StrokeThickness="0"
+                                Fill="Gray" />
+
+                                            <Label Grid.Row="0" Grid.Column="2" Text="{Binding AvgSpeed, StringFormat='{0} km/h' }" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
+                                            <Label Grid.Row="1" Grid.Column="2" Text="Average Speed" FontSize="13" HorizontalTextAlignment="Center" />
+
+                                            <Rectangle Grid.RowSpan="2" Grid.Column="3"
+                                       VerticalOptions="Fill"
+                                       WidthRequest="1"
+                                       StrokeThickness="0"
+                                       Fill="Gray" />
+
+                                            <Label Grid.Row="0" Grid.Column="4" Text="{Binding RightTurns }" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
+                                            <Label Grid.Row="1" Grid.Column="4" Text="Right Turns" FontSize="13" HorizontalTextAlignment="Center" />
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Overview text, notifications bell, and date. -->
+                            
+
+
+                                <!-- Overview items. -->
+                                <VerticalStackLayout Grid.Row="1"
+                                     BindableLayout.ItemsSource="{Binding OverviewItems}"
+                                     Spacing="18">
+                                    <Label Margin="5,25,0,15" Text="Rides history" FontAttributes="Bold" FontSize="22" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border StrokeThickness="0" StrokeShape="RoundRectangle 25"
+                                    HeightRequest="80">
+                                                <Border.Shadow>
+                                                    <Shadow Radius="60" Opacity="0.2" />
+                                                </Border.Shadow>    
+                                                <Grid RowDefinitions="60" ColumnDefinitions="60,Auto,*,Auto"
+                                      ColumnSpacing="10" Padding="15,0,15,0" VerticalOptions="Center">
+                                                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                                            BackgroundColor="{StaticResource SeconaryBackground}">
+                                                        <Image Source="{Binding IconSource}" HeightRequest="36" />
+                                                    </Border>
+                                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                        <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" />
+                                                        <Label Text="{Binding Details}" FontSize="12" />
+                                                    </VerticalStackLayout>
+
+                                                    <Label Grid.Column="3" Text="{Binding Speed, StringFormat='{0} km/h'}" FontAttributes="Bold" VerticalOptions="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </ScrollView>
+
+                    </tabView:SfTabItem.Content>
+                </tabView:SfTabItem>
+
+                <tabView:SfTabItem Header="Rides">
+                    <tabView:SfTabItem.Content>
+                        <Grid BackgroundColor="Green"/>
+                    </tabView:SfTabItem.Content>
+                </tabView:SfTabItem>
+
+                <tabView:SfTabItem Header="Settings">
+                    <tabView:SfTabItem.Content>
+                        <Grid BackgroundColor="Blue"/>
+                    </tabView:SfTabItem.Content>
+                </tabView:SfTabItem>
+            </tabView:SfTabView.Items>
+        </tabView:SfTabView>
+    </ContentPage.Content>
+
+
+</ContentPage>

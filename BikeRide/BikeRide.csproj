@@ -49,7 +49,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\turn_left.png" />
+	  <None Remove="Resources\Images\turn_right.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="Syncfusion.Maui.TabView" Version="20.4.52" />
 	</ItemGroup>
 
 </Project>
