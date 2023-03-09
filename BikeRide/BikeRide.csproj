@@ -49,12 +49,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\img_ble_pair.svg" />
+	  <None Remove="Resources\Images\img_ble_paired.svg" />
+	  <None Remove="Resources\Images\img_search.svg" />
+	  <None Remove="Resources\Images\settings.png" />
 	  <None Remove="Resources\Images\turn_left.png" />
 	  <None Remove="Resources\Images\turn_right.png" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Maui" Version="5.0.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="Plugin.BLE" Version="2.1.3" />
 		<PackageReference Include="Syncfusion.Maui.TabView" Version="20.4.52" />
 	</ItemGroup>
 

@@ -5,7 +5,9 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="BikeRide.MainPage"
              xmlns:vm="clr-namespace:BikeRide.ViewModels"
-             x:DataType="vm:MainViewModel">
+             x:DataType="vm:MainViewModel"
+             xmlns:model="clr-namespace:BikeRide.Models"
+             xmlns:utils="clr-namespace:BikeRide.Utils">
     
     <ContentPage.Content>
         <tabView:SfTabView x:Name="tabView" TabBarPlacement="Bottom">
@@ -92,9 +94,122 @@
                     </tabView:SfTabItem.Content>
                 </tabView:SfTabItem>
 
-                <tabView:SfTabItem Header="Settings">
+                <tabView:SfTabItem ImageSource="settings">
                     <tabView:SfTabItem.Content>
-                        <Grid BackgroundColor="Blue"/>
+
+                        <Grid>
+                            <Grid RowSpacing="10" Padding="20" RowDefinitions="Auto,Auto,Auto,*,Auto">
+                                
+                                <Label Grid.Row="0" Text="Bluetooth devices:" FontSize="Medium" TextColor="Black" />
+
+                                <Frame Grid.Row="1" BackgroundColor="#23ABE3" HasShadow="False" BorderColor="Transparent" CornerRadius="5" Padding="10,0,0,0">
+                                    <Grid ColumnDefinitions="*, Auto, 1, Auto" ColumnSpacing="0">
+                                        <Grid Grid.Column="0">
+                                            <Picker TextColor="White" FontSize="Medium" BackgroundColor="Transparent" Margin="0,4,0,0"
+                                ItemsSource="{Binding DeviceList}" ItemDisplayBinding="{Binding Name}" SelectedItem="{Binding DeviceSelected}"/>
+                                        </Grid>
+
+                                        <!--<Grid Grid.Column="1" WidthRequest="50" HeightRequest="50">
+                                            <Button Command="{Binding CmdToggleConnection}" BackgroundColor="White" CornerRadius="5" />
+                                            <Image Margin="10" HorizontalOptions="Center" VerticalOptions="Center" Source="icon_connected">
+                                                <Image.Triggers>
+                                                    <DataTrigger TargetType="Image" Binding="{Binding IsDeviceListEmpty}" Value="True">
+                                                        <Setter Property="Opacity" Value="0.5" />
+                                                        <Setter Property="InputTransparent" Value="False" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Image" Binding="{Binding IsDeviceListEmpty}" Value="False">
+                                                        <Setter Property="Opacity" Value="1" />
+                                                        <Setter Property="InputTransparent" Value="True" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Image" Binding="{Binding IsScanning}" Value="True">
+                                                        <Setter Property="IsVisible" Value="False" />
+                                                        <Setter Property="InputTransparent" Value="False" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Image" Binding="{Binding IsScanning}" Value="False">
+                                                        <Setter Property="IsVisible" Value="True" />
+                                                        <Setter Property="InputTransparent" Value="True" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Image" Binding="{Binding IsConnected}" Value="True">
+                                                        <Setter Property="Source" Value="img_ble_paired" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Image" Binding="{Binding IsConnected}" Value="False">
+                                                        <Setter Property="Source" Value="img_ble_pair" />
+                                                    </DataTrigger>
+                                                </Image.Triggers>
+                                            </Image>
+                                            <ActivityIndicator Color="White" IsRunning="True" IsVisible="{Binding IsScanning}" Margin="7" />
+                                        </Grid>-->
+
+                                        <BoxView Grid.Column="2" Color="White" />
+
+                                        <Grid Grid.Column="3" WidthRequest="50" HeightRequest="50">
+                                            <Button Command="{Binding CmdSearchForDevices}" BackgroundColor="Transparent" CornerRadius="5" />
+                                            <Image Source="img_search" Margin="10" InputTransparent="True" HorizontalOptions="Center" />
+                                        </Grid>
+                                    </Grid>
+                                </Frame>
+
+                                <Label Grid.Row="2" Text="Current Bluetooth Status:" TextColor="Black" FontSize="Medium" Margin="0,5" />
+
+                                <Frame Grid.Row="3" BackgroundColor="#23ABE3" HasShadow="False" Padding="10" BorderColor="Transparent">
+                                    <Grid>
+                                        <StackLayout Spacing="10" VerticalOptions="Center">
+                                            <!--<Label Grid.Row="0" Text="Temperature" FontSize="35"
+                                TextColor="White" HorizontalOptions="Center" VerticalOptions="End" />-->
+
+                                            <Grid Grid.Column="1" WidthRequest="200" HeightRequest="200">
+                                                <Button Command="{Binding CmdToggleConnection}" BackgroundColor="Transparent" CornerRadius="5" />
+                                                <Image Margin="10" HorizontalOptions="Center" VerticalOptions="Center" Source="icon_connected">
+                                                    <Image.Triggers>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding IsDeviceListEmpty}" Value="True">
+                                                            <Setter Property="Opacity" Value="0.5" />
+                                                            <Setter Property="InputTransparent" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding IsDeviceListEmpty}" Value="False">
+                                                            <Setter Property="Opacity" Value="1" />
+                                                            <Setter Property="InputTransparent" Value="True" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding IsScanning}" Value="True">
+                                                            <Setter Property="IsVisible" Value="False" />
+                                                            <Setter Property="InputTransparent" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding IsScanning}" Value="False">
+                                                            <Setter Property="IsVisible" Value="True" />
+                                                            <Setter Property="InputTransparent" Value="True" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding IsConnected}" Value="True">
+                                                            <Setter Property="Source" Value="img_ble_paired" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding IsConnected}" Value="False">
+                                                            <Setter Property="Source" Value="img_ble_pair" />
+                                                        </DataTrigger>
+                                                    </Image.Triggers>
+                                                </Image>
+                                                <ActivityIndicator Color="White" IsRunning="True" IsVisible="{Binding IsScanning}" Margin="7" />
+                                            </Grid>
+
+                                            <Label Grid.Row="1" FontSize="30" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                                                <Label.Text>
+                                                    <Binding Source="{vm:BaseViewModel}" Path="IsConnected">
+                                                        <Binding.Converter>
+                                                            <utils:BoolToObjectConverter x:TypeArguments="x:String" TrueObject="Connected" FalseObject="Not Connected" />
+                                                        </Binding.Converter>
+                                                    </Binding>
+                                                </Label.Text>
+                                            </Label>
+                                    
+
+                                    
+
+                                            <!--<Button Grid.Row="2" Text="Update" FontSize="Medium"
+                                Command="{Binding CmdGetTemperature}" VerticalOptions="Start"
+                                TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />-->
+                                        </StackLayout>
+                                    </Grid>
+                                </Frame>
+                            </Grid>
+                        </Grid>
+
                     </tabView:SfTabItem.Content>
                 </tabView:SfTabItem>
             </tabView:SfTabView.Items>
