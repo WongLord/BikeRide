@@ -2,7 +2,7 @@
 
 public class BaseViewModel : INotifyPropertyChanged
 {
-    int listenTimeout = 5000;
+    int listenTimeout = 30000;
 
     protected ushort DEVICE_ID = 253;
 

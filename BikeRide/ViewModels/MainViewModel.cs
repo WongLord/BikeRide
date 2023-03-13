@@ -1,7 +1,4 @@
-﻿
-
-using Plugin.BLE.Abstractions.Exceptions;
-using Plugin.BLE.Abstractions.Extensions;
+﻿using Syncfusion.Maui.Maps;
 
 namespace BikeRide.ViewModels;
 
@@ -13,6 +10,7 @@ public class MainViewModel : BaseViewModel
 
         CmdGetTemperature = new Command(async () => await GetTemperature());
 
+        Rides.ForEach(r => { r.MapCenter = r.GpsPoints[(r.GpsPoints.Count / 2) - 1]; });
     }
 
     #region Home Tab Code
@@ -71,6 +69,55 @@ public class MainViewModel : BaseViewModel
             Details = "Your Turn Right",
 
             Speed = 18.5
+        }
+    };
+
+    #endregion
+
+    #region Rides Tab Code
+
+    //public MapLatLng MapCenter { get; set; } = new MapLatLng { Latitude = 31.294967072903898, Longitude = -110.94911890126043 };
+
+    public List<RidesHistory> Rides { get; set; } = new List<RidesHistory>
+    {
+        new RidesHistory
+        {
+            DateTime = DateTime.Now,
+            GpsPoints = new ObservableCollection<MapLatLng>
+            {
+                new MapLatLng { Latitude = 31.292736570443644, Longitude=-110.94944681504553 },
+                new MapLatLng { Latitude = 31.29214433096709, Longitude=  -110.94933113906677 },
+                new MapLatLng { Latitude = 31.292733306421663, Longitude=-110.94768725929922 },
+                new MapLatLng{ Latitude=31.292360966046672, Longitude=-110.94639988349347},
+                new MapLatLng{ Latitude=31.291761833444056, Longitude=-110.94554823493918},
+                new MapLatLng{ Latitude=31.291460573238986, Longitude=-110.94563141921658}
+            }
+        },
+        new RidesHistory
+        {
+            DateTime = DateTime.Now,
+            GpsPoints = new ObservableCollection<MapLatLng>
+            {
+                new MapLatLng { Latitude = 31.292736570443644, Longitude=-110.94944681504553 },
+                new MapLatLng { Latitude = 31.29214433096709, Longitude=  -110.94933113906677 },
+                new MapLatLng { Latitude = 31.292733306421663, Longitude=-110.94768725929922 },
+                new MapLatLng{ Latitude=31.292360966046672, Longitude=-110.94639988349347},
+                new MapLatLng{ Latitude=31.291761833444056, Longitude=-110.94554823493918},
+                new MapLatLng{ Latitude=31.291460573238986, Longitude=-110.94563141921658}
+            }
+        },
+        new RidesHistory
+        {
+            DateTime = DateTime.Now,
+            GpsPoints = new ObservableCollection<MapLatLng>
+            {
+                new MapLatLng { Latitude = 31.292736570443644, Longitude=-110.94944681504553 },
+                new MapLatLng { Latitude = 31.29214433096709, Longitude=  -110.94933113906677 },
+                new MapLatLng { Latitude = 31.292733306421663, Longitude=-110.94768725929922 },
+                new MapLatLng{ Latitude=31.292360966046672, Longitude=-110.94639988349347},
+                new MapLatLng{ Latitude=31.291761833444056, Longitude=-110.94554823493918},
+                new MapLatLng{ Latitude=31.291460573238986, Longitude=-110.94563141921658}
+            }
         }
     };
 

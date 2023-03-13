@@ -7,11 +7,29 @@
              xmlns:vm="clr-namespace:BikeRide.ViewModels"
              x:DataType="vm:MainViewModel"
              xmlns:model="clr-namespace:BikeRide.Models"
-             xmlns:utils="clr-namespace:BikeRide.Utils">
-    
+             xmlns:utils="clr-namespace:BikeRide.Utils"
+             xmlns:map="clr-namespace:Syncfusion.Maui.Maps;assembly=Syncfusion.Maui.Maps"
+             Title="">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="MapMarkerTemplate">
+                <StackLayout HorizontalOptions="StartAndExpand"
+                         VerticalOptions="Center">
+                    <Image Source="map.png"
+                       Scale="1"
+                       Aspect="AspectFit"
+                       HorizontalOptions="StartAndExpand"
+                       VerticalOptions="Center"
+                       HeightRequest="35"
+                       WidthRequest="25" />
+                </StackLayout>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.Content>
         <tabView:SfTabView x:Name="tabView" TabBarPlacement="Bottom">
             <tabView:SfTabView.Items TabImagePosition="Top" >
+                
                 <tabView:SfTabItem ImageSource="home.png" >
                     <tabView:SfTabItem.Content>
                         <ScrollView>
@@ -38,7 +56,7 @@
                                             <Rectangle Grid.RowSpan="2" Grid.Column="1" VerticalOptions="Fill" WidthRequest="1" StrokeThickness="0" Fill="Gray" />
 
                                             <Label Grid.Row="0" Grid.Column="2" Text="{Binding AvgSpeed, StringFormat='{0} km/h' }" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
-                                            <Label Grid.Row="1" Grid.Column="2" Text="Average Speed" FontSize="13" HorizontalTextAlignment="Center" />
+                                            <Label Grid.Row="1" Grid.Column="2" Text="Avg Speed" FontSize="13" HorizontalTextAlignment="Center" />
 
                                             <Rectangle Grid.RowSpan="2" Grid.Column="3" VerticalOptions="Fill" WidthRequest="1" StrokeThickness="0" Fill="Gray" />
 
@@ -88,9 +106,51 @@
                     </tabView:SfTabItem.Content>
                 </tabView:SfTabItem>
 
-                <tabView:SfTabItem Header="Rides">
+                <tabView:SfTabItem ImageSource="bike.png">
                     <tabView:SfTabItem.Content>
-                        <Grid BackgroundColor="Green"/>
+                        <ScrollView>
+                            <Grid RowDefinitions="*" RowSpacing="15" Padding="30,25,30,0">
+
+                                <VerticalStackLayout Grid.Row="0" BindableLayout.ItemsSource="{Binding Rides}" Spacing="10">
+
+
+
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border StrokeThickness="0" HeightRequest="250">
+                                                <Grid RowDefinitions="40,200">
+                                                    <Label Grid.Row="0" Text="{Binding DateTime}" FontAttributes="Bold" FontSize="22" TextColor="{StaticResource Primary}" VerticalOptions="Center" />
+                                                    <Border Grid.Row="1" StrokeThickness="0" StrokeShape="RoundRectangle 25" HeightRequest="200">
+                                                        <Grid RowDefinitions="200" Padding="0,0,0,0" VerticalOptions="End">
+                                                            <map:SfMaps Grid.Row="0">
+                                                                <map:SfMaps.Layer>
+                                                                    <map:MapTileLayer Radius="0.1" DistanceType="Kilometer" MarkerTemplate="{StaticResource MapMarkerTemplate}" Center="{Binding MapCenter}"
+                                                                              UrlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png">
+
+                                                                        <map:MapTileLayer.ZoomPanBehavior>
+                                                                            <map:MapZoomPanBehavior ZoomLevel="25" EnableZooming="True" />
+                                                                        </map:MapTileLayer.ZoomPanBehavior>
+
+                                                                        <map:MapTileLayer.Sublayers>
+                                                                            <map:MapPolylineLayer >
+                                                                                <map:MapPolylineLayer.Polylines StrokeThickness="3" StrokeLineCap="Round">
+                                                                                    <map:MapPolyline Points="{Binding GpsPoints}" />
+                                                                                </map:MapPolylineLayer.Polylines>
+                                                                            </map:MapPolylineLayer>
+                                                                        </map:MapTileLayer.Sublayers>
+
+                                                                    </map:MapTileLayer>
+                                                                </map:SfMaps.Layer>
+                                                            </map:SfMaps>
+                                                        </Grid>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </ScrollView>
                     </tabView:SfTabItem.Content>
                 </tabView:SfTabItem>
 
@@ -212,6 +272,7 @@
 
                     </tabView:SfTabItem.Content>
                 </tabView:SfTabItem>
+                
             </tabView:SfTabView.Items>
         </tabView:SfTabView>
     </ContentPage.Content>
