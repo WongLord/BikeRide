@@ -1,18 +1,23 @@
-﻿namespace BikeRide.ViewModels;
+﻿using InTheHand.Net;
+using InTheHand.Net.Bluetooth;
+using InTheHand.Net.Sockets;
+using System.Reflection.PortableExecutable;
+using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace BikeRide.ViewModels;
+
+
 
 public class BaseViewModel : INotifyPropertyChanged
 {
-    int listenTimeout = 30000;
+    BluetoothClient client = new();
+    BluetoothDeviceInfo device = null;
 
-    protected ushort DEVICE_ID = 253;
+    public ObservableCollection<BluetoothDeviceInfo> DeviceList { get; set; }
 
-    protected IAdapter adapter;
-    protected IService service;
-
-    public ObservableCollection<IDevice> DeviceList { get; set; }
-
-    IDevice deviceSelected;
-    public IDevice DeviceSelected
+    BluetoothDeviceInfo deviceSelected;
+    public BluetoothDeviceInfo DeviceSelected
     {
         get => deviceSelected;
         set { deviceSelected = value; OnPropertyChanged(nameof(DeviceSelected)); }
@@ -42,47 +47,86 @@ public class BaseViewModel : INotifyPropertyChanged
     public ICommand CmdToggleConnection { get; set; }
 
     public ICommand CmdSearchForDevices { get; set; }
+    public ICommand CmdSend1 { get; set; }
+    public ICommand CmdSend2 { get; set; }
 
     public BaseViewModel()
     {
-        DeviceList = new ObservableCollection<IDevice>();
+        
 
-        adapter = CrossBluetoothLE.Current.Adapter;
-        adapter.ScanTimeout = listenTimeout;
-        adapter.ScanMode = ScanMode.LowLatency;
-        adapter.DeviceDiscovered += AdapterDeviceDiscovered;
+        DeviceList = new ObservableCollection<BluetoothDeviceInfo>();
 
         CmdToggleConnection = new Command(async () => await ToggleConnection());
 
         CmdSearchForDevices = new Command(async () => await DiscoverDevices());
+
+        CmdSend1 = new Command(async () => await SendData("1"));
+        CmdSend2 = new Command(async () => await SendData("2"));
+
+        Task.Run(async() => await DiscoverDevices());
+        
     }
 
-    async Task ScanTimeoutTask()
+    private async Task SendData(string data)
     {
-        await Task.Delay(listenTimeout);
-        await adapter.StopScanningForDevicesAsync();
-        IsScanning = false;
+        var stream = client.GetStream();
+        StreamWriter sw = new(stream, System.Text.Encoding.ASCII);
+        await sw.WriteLineAsync(data);
+        sw.Flush();
+        //sw.Close();
+
+        //client.Connect(device.DeviceAddress, BluetoothService.SerialPort);
+
     }
 
-    async void AdapterDeviceDiscovered(object sender, DeviceEventArgs e)
+    static BluetoothListener listener = new BluetoothListener(BluetoothService.SerialPort);
+
+    private void ReceiveData()
     {
-        if (DeviceList.FirstOrDefault(x => x.Name == e.Device.Name) == null && !string.IsNullOrEmpty(e.Device.Name))
+        //string commandReceived = "";
+        var stream = client.GetStream();
+
+        byte[] receive = new byte[1024];
+
+        while (true)
         {
-            DeviceList.Add(e.Device);
+            
+           
+
+            //if (stream != null && client.Connected)
+            //{
+
+            //    StreamReader sr = new(stream, System.Text.Encoding.Unicode);
+                
+
+                Array.Clear(receive, 0, receive.Length);
+                var readMessage = "";
+                do
+                {
+                    Thread.Sleep(1000);
+                    stream.Read(receive, 0, receive.Length);
+                    readMessage += Encoding.ASCII.GetString(receive);
+                }
+                while (stream.DataAvailable);
+
+            var commandReceived = readMessage.FirstOrDefault();// await sr.ReadToEndAsync();
+
+
+                //await Shell.Current.DisplayAlert($"Command Received", $"Command: {readMessage}", "OK");
+                
+            //}
+
+            //Task.Delay(1000).Wait();
         }
 
-        //if (e != null && e.Device != null && !string.IsNullOrEmpty(e.Device.Name) && e.Device.Name.Contains("Gal"))
-        //{
-        //    await adapter.StopScanningForDevicesAsync();
-        //    IsDeviceListEmpty = false;
-        //    DeviceSelected = e.Device;
-        //}
     }
 
     async Task DiscoverDevices()
     {
         try
         {
+
+            //IsScanning = true;
             PermissionStatus permissionStatus = await CheckBluetoothPermissions();
             if (permissionStatus != PermissionStatus.Granted)
             {
@@ -94,20 +138,31 @@ public class BaseViewModel : INotifyPropertyChanged
                 }
             }
 
-            IsScanning = true;
-
-            var tasks = new Task[]
+            foreach (var dev in client.DiscoverDevices())
             {
-                    ScanTimeoutTask(),
-                    adapter.StartScanningForDevicesAsync()
-            };
+                if (dev.DeviceName != null)
+                {
+                    if (dev.DeviceName.Contains("Bike"))
+                    {
 
-            await Task.WhenAny(tasks);
+                        device = dev;
+                        DeviceList.Add(device);
+                        DeviceSelected = device;
+                        IsDeviceListEmpty = false;
+                        //IsScanning = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!device.Authenticated)
+            {
+                BluetoothSecurity.PairRequest(device.DeviceAddress, "0000");
+            }
+            device.Refresh();
+
         }
-        catch (DeviceConnectionException ex)
-        {
-            Debug.WriteLine(ex.Message);
-        }
+        
         catch (Exception ex)
         {
             Debug.WriteLine(ex.Message);
@@ -120,18 +175,40 @@ public class BaseViewModel : INotifyPropertyChanged
         {
             if (IsConnected)
             {
-                await adapter.DisconnectDeviceAsync(DeviceSelected);
+                client.Close();
                 IsConnected = false;
             }
             else
             {
-                await adapter.ConnectToDeviceAsync(DeviceSelected);
-                IsConnected = true;
+                IsScanning = true;
+                PermissionStatus permissionStatus = await CheckBluetoothPermissions();
+                if (permissionStatus != PermissionStatus.Granted)
+                {
+                    permissionStatus = await RequestBluetoothPermissions();
+                    if (permissionStatus != PermissionStatus.Granted)
+                    {
+                        await Shell.Current.DisplayAlert($"Bluetooth LE permissions", $"Bluetooth LE permissions are not granted.", "OK");
+                        return;
+                    }
+                }
+
+                await Task.Run(() =>
+                {
+                    BluetoothAddress bta = new(Convert.ToUInt64("00220901163A", 16));
+                    client.Connect(bta, BluetoothService.SerialPort);
+                    DeviceSelected = device;
+                    IsDeviceListEmpty = false;
+                    IsScanning = false;
+                    
+
+                    Thread tr = new(ReceiveData);
+                    tr.IsBackground = true;
+                    tr.Start();
+                });
+
+                IsConnected = client.Connected;
+                    
             }
-        }
-        catch (DeviceConnectionException ex)
-        {
-            Debug.WriteLine(ex.Message);
         }
         catch (Exception ex)
         {

@@ -166,39 +166,8 @@
                                     <Grid ColumnDefinitions="*, Auto, 1, Auto" ColumnSpacing="0">
                                         <Grid Grid.Column="0">
                                             <Picker TextColor="White" FontSize="Medium" BackgroundColor="Transparent" Margin="0,4,0,0"
-                                ItemsSource="{Binding DeviceList}" ItemDisplayBinding="{Binding Name}" SelectedItem="{Binding DeviceSelected}"/>
+                                ItemsSource="{Binding DeviceList}" ItemDisplayBinding="{Binding DeviceName}" SelectedItem="{Binding DeviceSelected}"/>
                                         </Grid>
-
-                                        <!--<Grid Grid.Column="1" WidthRequest="50" HeightRequest="50">
-                                            <Button Command="{Binding CmdToggleConnection}" BackgroundColor="White" CornerRadius="5" />
-                                            <Image Margin="10" HorizontalOptions="Center" VerticalOptions="Center" Source="icon_connected">
-                                                <Image.Triggers>
-                                                    <DataTrigger TargetType="Image" Binding="{Binding IsDeviceListEmpty}" Value="True">
-                                                        <Setter Property="Opacity" Value="0.5" />
-                                                        <Setter Property="InputTransparent" Value="False" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Image" Binding="{Binding IsDeviceListEmpty}" Value="False">
-                                                        <Setter Property="Opacity" Value="1" />
-                                                        <Setter Property="InputTransparent" Value="True" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Image" Binding="{Binding IsScanning}" Value="True">
-                                                        <Setter Property="IsVisible" Value="False" />
-                                                        <Setter Property="InputTransparent" Value="False" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Image" Binding="{Binding IsScanning}" Value="False">
-                                                        <Setter Property="IsVisible" Value="True" />
-                                                        <Setter Property="InputTransparent" Value="True" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Image" Binding="{Binding IsConnected}" Value="True">
-                                                        <Setter Property="Source" Value="img_ble_paired" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Image" Binding="{Binding IsConnected}" Value="False">
-                                                        <Setter Property="Source" Value="img_ble_pair" />
-                                                    </DataTrigger>
-                                                </Image.Triggers>
-                                            </Image>
-                                            <ActivityIndicator Color="White" IsRunning="True" IsVisible="{Binding IsScanning}" Margin="7" />
-                                        </Grid>-->
 
                                         <BoxView Grid.Column="2" Color="White" />
 
@@ -261,9 +230,14 @@
 
                                     
 
-                                            <!--<Button Grid.Row="2" Text="Update" FontSize="Medium"
-                                Command="{Binding CmdGetTemperature}" VerticalOptions="Start"
-                                TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />-->
+                                            <Button Grid.Row="2" Text="Turn On" FontSize="Medium"
+                                Command="{Binding CmdSend1}" VerticalOptions="Start"
+                                TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />
+                                            
+                                            
+                                            <Button Grid.Row="3" Text="Turn Off" FontSize="Medium"
+                                Command="{Binding CmdSend2}" VerticalOptions="Start"
+                                TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />
                                         </StackLayout>
                                     </Grid>
                                 </Frame>

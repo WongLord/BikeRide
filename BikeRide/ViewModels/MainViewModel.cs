@@ -5,10 +5,6 @@ namespace BikeRide.ViewModels;
 public class MainViewModel : BaseViewModel
 {
     public MainViewModel(){
-        adapter.DeviceConnected += AdapterDeviceConnected;
-        adapter.DeviceDisconnected += AdapterDeviceDisconnected;
-
-        CmdGetTemperature = new Command(async () => await GetTemperature());
 
         Rides.ForEach(r => { r.MapCenter = r.GpsPoints[(r.GpsPoints.Count / 2) - 1]; });
     }
@@ -124,53 +120,6 @@ public class MainViewModel : BaseViewModel
     #endregion
 
     #region Settings Bluetooh Tab Code
-    ICharacteristic tempCharacteristic;
-
-    string temperatureValue;
-    public string TemperatureValue
-    {
-        get => temperatureValue;
-        set { temperatureValue = value; OnPropertyChanged(nameof(TemperatureValue)); }
-    }
-
-    public ICommand CmdGetTemperature { get; set; }
-
-    async void AdapterDeviceConnected(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
-    {
-        IsConnected = true;
-
-        IDevice device = e.Device;
-
-        var services = await device.GetServicesAsync();
-
-        foreach (var serviceItem in services)
-        {
-            if (UuidToUshort(serviceItem.Id.ToString()) == DEVICE_ID)
-            {
-                service = serviceItem;
-            }
-        }
-
-        tempCharacteristic = await service.GetCharacteristicAsync(Guid.Parse(CharacteristicsConstants.TEMPERATURE));
-    }
-
-    void AdapterDeviceDisconnected(object sender, Plugin.BLE.Abstractions.EventArgs.DeviceEventArgs e)
-    {
-        IsConnected = false;
-    }
-
-    async Task GetTemperature()
-    {
-        try
-        {
-            TemperatureValue = Encoding.Default.GetString(await tempCharacteristic.ReadAsync()).Split(';')[0];
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-
    
     #endregion
 }
