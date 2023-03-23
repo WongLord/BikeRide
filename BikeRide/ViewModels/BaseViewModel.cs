@@ -1,13 +1,4 @@
-﻿using InTheHand.Net;
-using InTheHand.Net.Bluetooth;
-using InTheHand.Net.Sockets;
-using System.Reflection.PortableExecutable;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace BikeRide.ViewModels;
-
-
+﻿namespace BikeRide.ViewModels;
 
 public class BaseViewModel : INotifyPropertyChanged
 {
@@ -62,7 +53,6 @@ public class BaseViewModel : INotifyPropertyChanged
         CmdSend2 = new Command(async () => await SendData("2"));
 
         Task.Run(async () => await DiscoverDevices());
-
     }
 
     private async Task SendData(string data)
