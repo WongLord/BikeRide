@@ -52,8 +52,6 @@ public class BaseViewModel : INotifyPropertyChanged
 
     public BaseViewModel()
     {
-        
-
         DeviceList = new ObservableCollection<BluetoothDeviceInfo>();
 
         CmdToggleConnection = new Command(async () => await ToggleConnection());
@@ -63,8 +61,8 @@ public class BaseViewModel : INotifyPropertyChanged
         CmdSend1 = new Command(async () => await SendData("1"));
         CmdSend2 = new Command(async () => await SendData("2"));
 
-        Task.Run(async() => await DiscoverDevices());
-        
+        Task.Run(async () => await DiscoverDevices());
+
     }
 
     private async Task SendData(string data)
@@ -76,49 +74,47 @@ public class BaseViewModel : INotifyPropertyChanged
         //sw.Close();
 
         //client.Connect(device.DeviceAddress, BluetoothService.SerialPort);
-
     }
 
-    static BluetoothListener listener = new BluetoothListener(BluetoothService.SerialPort);
-
-    private void ReceiveData()
+    private async void ReceiveData()
     {
-        //string commandReceived = "";
         var stream = client.GetStream();
-
         byte[] receive = new byte[1024];
 
         while (true)
         {
-            
-           
+            Array.Clear(receive, 0, receive.Length);
+            var readMessage = "";
+            do
+            {
+                Thread.Sleep(1000);
+                stream.Read(receive, 0, receive.Length);
+                readMessage += Encoding.ASCII.GetString(receive);
+            }
+            while (stream.DataAvailable);
 
-            //if (stream != null && client.Connected)
-            //{
-
-            //    StreamReader sr = new(stream, System.Text.Encoding.Unicode);
-                
-
-                Array.Clear(receive, 0, receive.Length);
-                var readMessage = "";
-                do
-                {
-                    Thread.Sleep(1000);
-                    stream.Read(receive, 0, receive.Length);
-                    readMessage += Encoding.ASCII.GetString(receive);
-                }
-                while (stream.DataAvailable);
-
-            var commandReceived = readMessage.FirstOrDefault();// await sr.ReadToEndAsync();
-
-
-                //await Shell.Current.DisplayAlert($"Command Received", $"Command: {readMessage}", "OK");
-                
-            //}
-
-            //Task.Delay(1000).Wait();
+            switch (readMessage.FirstOrDefault())
+            {
+                case '1': await LeftTurn(); break;
+                case '2': await RightTurn(); break;
+                case '3': await Stop(); break;
+            }
         }
 
+        static async Task LeftTurn()
+        {
+
+        }
+
+        static async Task RightTurn()
+        {
+
+        }
+
+        static async Task Stop()
+        {
+
+        }
     }
 
     async Task DiscoverDevices()
@@ -146,7 +142,7 @@ public class BaseViewModel : INotifyPropertyChanged
                     {
 
                         device = dev;
-                        DeviceList.Add(device);
+                        DeviceList.Add(device.de);
                         DeviceSelected = device;
                         IsDeviceListEmpty = false;
                         //IsScanning = false;
@@ -162,7 +158,7 @@ public class BaseViewModel : INotifyPropertyChanged
             device.Refresh();
 
         }
-        
+
         catch (Exception ex)
         {
             Debug.WriteLine(ex.Message);
@@ -181,16 +177,7 @@ public class BaseViewModel : INotifyPropertyChanged
             else
             {
                 IsScanning = true;
-                PermissionStatus permissionStatus = await CheckBluetoothPermissions();
-                if (permissionStatus != PermissionStatus.Granted)
-                {
-                    permissionStatus = await RequestBluetoothPermissions();
-                    if (permissionStatus != PermissionStatus.Granted)
-                    {
-                        await Shell.Current.DisplayAlert($"Bluetooth LE permissions", $"Bluetooth LE permissions are not granted.", "OK");
-                        return;
-                    }
-                }
+
 
                 await Task.Run(() =>
                 {
@@ -199,7 +186,7 @@ public class BaseViewModel : INotifyPropertyChanged
                     DeviceSelected = device;
                     IsDeviceListEmpty = false;
                     IsScanning = false;
-                    
+
 
                     Thread tr = new(ReceiveData);
                     tr.IsBackground = true;
@@ -207,18 +194,13 @@ public class BaseViewModel : INotifyPropertyChanged
                 });
 
                 IsConnected = client.Connected;
-                    
+
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine(ex.Message);
         }
-    }
-
-    protected int UuidToUshort(string uuid)
-    {
-        return int.Parse(uuid.Substring(4, 4), System.Globalization.NumberStyles.HexNumber); ;
     }
 
     #region INotifyPropertyChanged Implementation
@@ -229,6 +211,7 @@ public class BaseViewModel : INotifyPropertyChanged
     }
     #endregion
 
+    #region Permisos
     public async Task<PermissionStatus> CheckBluetoothPermissions()
     {
         PermissionStatus status = PermissionStatus.Unknown;
@@ -258,4 +241,5 @@ public class BaseViewModel : INotifyPropertyChanged
         }
         return status;
     }
+    #endregion
 }
