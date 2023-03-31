@@ -7,9 +7,16 @@ public partial class MainPage : ContentPage
 
 	public MainPage()
 	{
-		InitializeComponent();
-        
-        BindingContext = new MainViewModel();
+        try
+        {
+            InitializeComponent();
+
+            BindingContext = new MainViewModel();
+        }
+        catch(Exception ex) 
+        {
+            BindingContext = new MainViewModel();
+        }
     }
 
 }

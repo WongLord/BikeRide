@@ -5,10 +5,11 @@ public class MainViewModel : BaseViewModel
     private const int USER_ID = 1;
     public MainViewModel()
     {
-        Rides.ForEach((p) => { p.MapCenter = p.GpsPoints[(p.GpsPoints.Count / 2) - 1]; });
+        //Rides.ForEach((p) => { p.MapCenter = p.GpsPoints[(p.GpsPoints.Count / 2) - 1]; });
+
         Task.Run(()=>GetOverviewItems(USER_ID)).Wait();
         //Task.Delay(1000).Wait();
-        //Task.Run(() => GetRidesHistory(USER_ID)).Wait();
+        Task.Run(() => GetRidesHistory(USER_ID)).Wait();
     }
 
     #region Home Tab Code
@@ -127,7 +128,7 @@ public class MainViewModel : BaseViewModel
             }
         }
 
-        //Rides = _rides;
+        Rides = _rides;
     }
     #endregion
 
