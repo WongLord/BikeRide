@@ -63,7 +63,7 @@
                                             <Label Grid.Row="0" Grid.Column="4" Text="{Binding RightTurns }" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalTextAlignment="Center" />
                                             <Label Grid.Row="1" Grid.Column="4" Text="Right Turns" FontSize="13" HorizontalTextAlignment="Center" />
                                         </Grid>
-                                        
+
                                     </Grid>
                                 </Border>
 
@@ -76,29 +76,29 @@
                                 </Grid>
 
                                 <!-- Overview items. -->
-                                <VerticalStackLayout Grid.Row="2" BindableLayout.ItemsSource="{Binding OverviewItems}" Spacing="18">
+                                <VerticalStackLayout Grid.Row="2" BindableLayout.ItemsSource="{Binding OverviewItems,Mode=TwoWay}" Spacing="18">
                                     <BindableLayout.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border StrokeThickness="0" StrokeShape="RoundRectangle 25" HeightRequest="80">
-                                                    <Border.Shadow>
-                                                        <Shadow Radius="60" Opacity="0.2" />
-                                                    </Border.Shadow>
-                                                    
-                                                    <Grid RowDefinitions="60" ColumnDefinitions="60,Auto,*,Auto" ColumnSpacing="10" Padding="15,0,15,0" VerticalOptions="Center">
-                                                        <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource SeconaryBackground}">
-                                                            <Image Source="{Binding IconSource}" HeightRequest="36" />
-                                                        </Border>
-                                                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                                            <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" />
-                                                            <Label Text="{Binding Details}" FontSize="12" />
-                                                        </VerticalStackLayout>
+                                        <DataTemplate>
+                                            <Border StrokeThickness="0" StrokeShape="RoundRectangle 25" HeightRequest="80">
+                                                <Border.Shadow>
+                                                    <Shadow Radius="60" Opacity="0.2" />
+                                                </Border.Shadow>
 
-                                                        <Label Grid.Column="3" Text="{Binding Speed, StringFormat='{0} km/h'}" FontAttributes="Bold" VerticalOptions="Center" />
-                                                    </Grid>
-                                                    
-                                                </Border>
-                                            </DataTemplate>
-                                        </BindableLayout.ItemTemplate>
+                                                <Grid RowDefinitions="60" ColumnDefinitions="60,Auto,*,Auto" ColumnSpacing="10" Padding="15,0,15,0" VerticalOptions="Center">
+                                                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource SeconaryBackground}">
+                                                        <Image Source="{Binding IconSource}" HeightRequest="36" />
+                                                    </Border>
+                                                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                        <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" />
+                                                        <Label Text="{Binding Details}" FontSize="12" />
+                                                    </VerticalStackLayout>
+
+                                                    <Label Grid.Column="3" Text="{Binding Speed, StringFormat='{0} km/h'}" FontAttributes="Bold" VerticalOptions="Center" />
+                                                </Grid>
+
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
                                 </VerticalStackLayout>
                             </Grid>
                         </ScrollView>
@@ -111,10 +111,7 @@
                         <ScrollView>
                             <Grid RowDefinitions="*" RowSpacing="15" Padding="30,25,30,0">
 
-                                <VerticalStackLayout Grid.Row="0" BindableLayout.ItemsSource="{Binding Rides}" Spacing="10">
-
-
-
+                                <VerticalStackLayout Grid.Row="0" BindableLayout.ItemsSource="{Binding Rides, Mode=TwoWay}" Spacing="10">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate>
                                             <Border StrokeThickness="0" HeightRequest="250">

@@ -9,9 +9,18 @@ namespace BikeRide.Models
 {
     public class RidesHistory
     {
-        public DateTime DateTime { get; set; } = DateTime.Now;
+        public DateTime DateTime { get; set; }
         public ObservableCollection<MapLatLng> GpsPoints { get; set; }
         public MapLatLng MapCenter { get; set; }
+    }
+
+    public class RidesPoints
+    {
+        public DateTime StartDateTime { get; set; }
+        public string Username { get; set; }
+        public string Time { get; set; }
+        public float Latitude { get; set; }
+        public float Longitude { get; set; }
     }
 
 }

@@ -14,5 +14,5 @@ public class OverviewItem
 
     public string Details { get; set; }
 
-    public double Speed { get; set; }
+    public string Speed { get; set; }
 }

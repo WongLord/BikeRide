@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BikeRide", "BikeRide\BikeRide.csproj", "{999480E9-73FE-4215-AA47-27809CBD04C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BikeRide_API", "BikeRide_API\BikeRide_API.csproj", "{811F2CBE-39D5-4A58-BFB6-B2AF5FF3C063}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{999480E9-73FE-4215-AA47-27809CBD04C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{999480E9-73FE-4215-AA47-27809CBD04C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{999480E9-73FE-4215-AA47-27809CBD04C2}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{811F2CBE-39D5-4A58-BFB6-B2AF5FF3C063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{811F2CBE-39D5-4A58-BFB6-B2AF5FF3C063}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{811F2CBE-39D5-4A58-BFB6-B2AF5FF3C063}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{811F2CBE-39D5-4A58-BFB6-B2AF5FF3C063}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

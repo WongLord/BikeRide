@@ -54,6 +54,7 @@
 	  <None Remove="Resources\Images\img_ble_paired.svg" />
 	  <None Remove="Resources\Images\img_search.svg" />
 	  <None Remove="Resources\Images\settings.png" />
+	  <None Remove="Resources\Images\stop_sign.svg" />
 	  <None Remove="Resources\Images\turn_left.png" />
 	  <None Remove="Resources\Images\turn_right.png" />
 	</ItemGroup>
@@ -63,6 +64,7 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
 		<PackageReference Include="InTheHand.Net.Bluetooth" Version="4.0.34.1" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Syncfusion.Maui.Maps" Version="20.4.53" />
 		<PackageReference Include="Syncfusion.Maui.TabView" Version="20.4.52" />
 	</ItemGroup>
@@ -71,6 +73,12 @@
 	  <PackageReference Include="InTheHand.AndroidActivity">
 	    <Version>1.0.1</Version>
 	  </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="System.Net.Http.Formatting">
+	    <HintPath>..\System.Net.Http.Formatting.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 </Project>
