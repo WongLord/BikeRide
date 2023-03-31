@@ -1,12 +1,14 @@
-﻿using Syncfusion.Maui.Maps;
-
-namespace BikeRide.ViewModels;
+﻿namespace BikeRide.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-    public MainViewModel(){
-
-        Rides.ForEach(r => { r.MapCenter = r.GpsPoints[(r.GpsPoints.Count / 2) - 1]; });
+    private const int USER_ID = 1;
+    public MainViewModel()
+    {
+        Rides.ForEach((p) => { p.MapCenter = p.GpsPoints[(p.GpsPoints.Count / 2) - 1]; });
+        Task.Run(()=>GetOverviewItems(USER_ID)).Wait();
+        //Task.Delay(1000).Wait();
+        //Task.Run(() => GetRidesHistory(USER_ID)).Wait();
     }
 
     #region Home Tab Code
@@ -18,62 +20,34 @@ public class MainViewModel : BaseViewModel
     public int AvgSpeed { get; set; } = 20;
     public int RightTurns { get; set; } = 71;
 
-    public List<OverviewItem> OverviewItems { get; set; } = new List<OverviewItem>
+    public List<OverviewItem> OverviewItems { get; set; }
+
+    public async Task GetOverviewItems(int userId)
     {
-        new OverviewItem
+        //OverviewItems = new();
+        List<OverviewItem> items = new();
+        HttpResponseMessage res = await ApiCalls.GETResponse("GetRideActions", $"?UserId={userId}");
+        if (res.IsSuccessStatusCode)
         {
-            IconSource = "turn_left",
+            var result = await res.Content.ReadAsStringAsync();
+            List<RideActions> actions = JsonConvert.DeserializeObject<List<RideActions>>(result);
+            
 
-            Title = "Left",
-            Details = "Your Turn Left",
-
-            Speed = 12.2
-        },
-        new OverviewItem
-        {
-            IconSource = "turn_left",
-
-             Title = "Left",
-            Details = "Your Turn Left",
-
-            Speed = 14.2
-        },
-        new OverviewItem
-        {
-            IconSource = "turn_right",
-
-            Title = "Right",
-            Details = "Your Turn Right",
-
-            Speed = 8.7
-        },
-        new OverviewItem
-        {
-            IconSource = "turn_left",
-
-             Title = "Left",
-            Details = "Your Turn Left",
-
-            Speed = 10.4
-        },
-        new OverviewItem
-        {
-            IconSource = "turn_right",
-
-
-             Title = "Right",
-            Details = "Your Turn Right",
-
-            Speed = 18.5
+            actions.ForEach((a) => {
+                items.Add(new OverviewItem
+                {
+                    IconSource = a.Actionname == "Turn Left" ? "turn_left": a.Actionname == "Turn Right" ? "turn_right":"stop_sign",
+                    Title = a.Actionname,
+                    Details = $"You {a.Actionname} on {a.Latitude}, {a.Longitude}",
+                    Speed = a.Speed.ToString(".0#")
+                });
+            });
         }
-    };
-
+        OverviewItems = items;
+    }
     #endregion
 
     #region Rides Tab Code
-
-    //public MapLatLng MapCenter { get; set; } = new MapLatLng { Latitude = 31.294967072903898, Longitude = -110.94911890126043 };
-
     public List<RidesHistory> Rides { get; set; } = new List<RidesHistory>
     {
         new RidesHistory
@@ -117,23 +91,47 @@ public class MainViewModel : BaseViewModel
         }
     };
 
+    public async Task GetRidesHistory(int userId)
+    {
+        List<RidesHistory> _rides = new();
+    
+        HttpResponseMessage res = await ApiCalls.GETResponse("GetRideLocPoints", $"?UserId={userId}");
+        if (res.IsSuccessStatusCode)
+        {
+            var result = await res.Content.ReadAsStringAsync();
+            List<RidesPoints> ridesPoints = JsonConvert.DeserializeObject<List<RidesPoints>>(result);
+
+            var groupedRides = ridesPoints.GroupBy(r => r.StartDateTime).Select(g => g.ToList()).ToList();
+
+            foreach (var g in groupedRides)
+            {
+                ObservableCollection<MapLatLng> Points = new();
+                DateTime _startDateTime = DateTime.Now;
+                g.ForEach((p) =>
+                {
+                    _startDateTime = p.StartDateTime;
+                    Points.Add(new MapLatLng
+                    {
+                        Latitude = p.Latitude,
+                        Longitude = p.Longitude
+                    });
+                });
+
+                _rides.Add(new RidesHistory
+                {
+                    DateTime = _startDateTime,
+                    GpsPoints = Points
+                });
+
+                _rides.ForEach((p) => { p.MapCenter = p.GpsPoints[(p.GpsPoints.Count / 2) - 1]; });
+            }
+        }
+
+        //Rides = _rides;
+    }
     #endregion
 
     #region Settings Bluetooh Tab Code
-   
+
     #endregion
-}
-
-public static class CharacteristicsConstants
-{
-    public const string ON = "73cfbc6f-61fa-4d80-a92f-eec2a90f8a3e";
-    public const string OFF = "6315119d-d619-49bb-a21d-ef9e99941948";
-    public const string PULSING = "d7551801-31fc-435d-a994-1e7f15e17baf";
-    public const string BLINKING = "3a6cc4f2-a6ab-4709-a9bf-c9611c6bf892";
-    public const string RUNNING_COLORS = "30df1258-f42b-4788-af2e-a8ed9d0b932f";
-
-    public const string IS_CYCLING = "24517ccc-888e-4ffc-9da5-21884353b08d";
-    public const string ANGLE = "5a0bb016-69ab-4a49-a2f2-de5b292458f3";
-
-    public const string TEMPERATURE = "e78f7b5e-842b-4b99-94e3-7401bf72b870";
 }

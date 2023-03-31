@@ -66,6 +66,7 @@ public class BaseViewModel : INotifyPropertyChanged
         //client.Connect(device.DeviceAddress, BluetoothService.SerialPort);
     }
 
+   static System.Numerics.Vector3 speed;
     private async void ReceiveData()
     {
         var stream = client.GetStream();
@@ -85,27 +86,49 @@ public class BaseViewModel : INotifyPropertyChanged
 
             switch (readMessage.FirstOrDefault())
             {
-                case '1': await LeftTurn(); break;
-                case '2': await RightTurn(); break;
-                case '3': await Stop(); break;
+                case '1': await SaveData(BikeAction.TurnLeft); await SendData("1"); break;
+                case '2': await SaveData(BikeAction.TurnRight); await SendData("1"); break;
+                case '3': await SaveData(BikeAction.Stop); await SendData("1"); break;
             }
         }
 
-        static async Task LeftTurn()
+        
+        static async Task SaveData(BikeAction action)
         {
+            GeolocationRequest request = new(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
+            Location location = await Geolocation.Default.GetLocationAsync(request, new CancellationTokenSource().Token);
+            ToggleAccelerometer();
 
+            //DB Connection
+            //SqlCommand cmd = new SqlCommand($"SP_Name '{action}', {location.Latitude}, {location.Longitude}, {speed}");
+
+            ToggleAccelerometer();
         }
 
-        static async Task RightTurn()
+        static void ToggleAccelerometer()
         {
-
+            if (Accelerometer.Default.IsSupported)
+            {
+                if (!Accelerometer.Default.IsMonitoring)
+                {
+                    Accelerometer.Default.ReadingChanged += Accelerometer_ReadingChanged;
+                    Accelerometer.Default.Start(SensorSpeed.UI);
+                }
+                else
+                {
+                    Accelerometer.Default.Stop();
+                    Accelerometer.Default.ReadingChanged -= Accelerometer_ReadingChanged;
+                }
+            }
         }
 
-        static async Task Stop()
+        static void Accelerometer_ReadingChanged(object sender, AccelerometerChangedEventArgs e)
         {
-
+            speed = (e.Reading.Acceleration) / (1000 / 3600);
         }
     }
+
+    
 
     async Task DiscoverDevices()
     {
@@ -132,7 +155,7 @@ public class BaseViewModel : INotifyPropertyChanged
                     {
 
                         device = dev;
-                        DeviceList.Add(device.de);
+                        DeviceList.Add(device);
                         DeviceSelected = device;
                         IsDeviceListEmpty = false;
                         //IsScanning = false;
