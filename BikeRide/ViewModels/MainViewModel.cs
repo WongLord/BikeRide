@@ -38,7 +38,7 @@ public class MainViewModel : BaseViewModel
                 {
                     IconSource = a.Actionname == "Turn Left" ? "turn_left": a.Actionname == "Turn Right" ? "turn_right":"stop_sign",
                     Title = a.Actionname,
-                    Details = $"You {a.Actionname} on {a.Latitude}, {a.Longitude}",
+                    Details = $"You {a.Actionname} at {a.Latitude}, {a.Longitude}",
                     Speed = a.Speed.ToString(".0#")
                 });
             });
