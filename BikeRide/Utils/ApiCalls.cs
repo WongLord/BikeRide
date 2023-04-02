@@ -2,7 +2,7 @@
 
 public class ApiCalls
 {
-    static string ApiBaseUrl = "https://delcamposupreme.com:144/br/";
+    static string ApiBaseUrl = "https://delcamposupreme.com/br/br/";
     public static async Task<HttpResponseMessage> GETResponse(string Url, string Parameters)
     {
         return await new HttpClient
@@ -15,9 +15,9 @@ public class ApiCalls
         }.GetAsync(Parameters);
     }
 
-    public static StreamReader PUTRequest(string Url, object obj)
+    public static StreamReader PUTRequest(string method, object obj)
     {
-        var httpRequest = (HttpWebRequest)WebRequest.Create(ApiBaseUrl + Url);
+        var httpRequest = (HttpWebRequest)WebRequest.Create(ApiBaseUrl + method);
         httpRequest.Method = "POST";
 
         httpRequest.Headers["accept"] = "text/plain";
@@ -39,5 +39,17 @@ public class ApiCalls
         //    return Convert.ToInt32(result == "" ? "0" : result.Replace("\"", ""));
         //}
         return new StreamReader(httpResponse.GetResponseStream());
+    }
+
+    public static async Task<HttpResponseMessage> GETRoad(float Lat, float Lon)
+    {
+        return await new HttpClient
+        {
+            BaseAddress = new Uri($"https://nominatim.openstreetmap.org/reverse?format=json&lat={Lat}&lon={Lon}"),
+            DefaultRequestHeaders =
+            {
+                { "accept", "*/*" },
+            }
+        }.GetAsync("");
     }
 }

@@ -7,8 +7,9 @@ namespace BikeRide.Utils
     }
     public enum BikeAction
     {
-        TurnLeft,
-        TurnRight,
-        Stop
+        NewRide = 1,
+        TurnLeft = 2,
+        TurnRight = 3,
+        Stop = 4
     }
 }

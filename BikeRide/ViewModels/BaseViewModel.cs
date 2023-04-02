@@ -1,4 +1,6 @@
-﻿namespace BikeRide.ViewModels;
+﻿using System.IO;
+
+namespace BikeRide.ViewModels;
 
 public class BaseViewModel : INotifyPropertyChanged
 {
@@ -66,7 +68,7 @@ public class BaseViewModel : INotifyPropertyChanged
         //client.Connect(device.DeviceAddress, BluetoothService.SerialPort);
     }
 
-   static System.Numerics.Vector3 speed;
+   //static System.Numerics.Vector3 speed;
     private async void ReceiveData()
     {
         var stream = client.GetStream();
@@ -97,34 +99,26 @@ public class BaseViewModel : INotifyPropertyChanged
         {
             GeolocationRequest request = new(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
             Location location = await Geolocation.Default.GetLocationAsync(request, new CancellationTokenSource().Token);
-            ToggleAccelerometer();
 
-            //DB Connection
-            //SqlCommand cmd = new SqlCommand($"SP_Name '{action}', {location.Latitude}, {location.Longitude}, {speed}");
-
-            ToggleAccelerometer();
-        }
-
-        static void ToggleAccelerometer()
-        {
-            if (Accelerometer.Default.IsSupported)
+            RideActions rideActions = new()
             {
-                if (!Accelerometer.Default.IsMonitoring)
-                {
-                    Accelerometer.Default.ReadingChanged += Accelerometer_ReadingChanged;
-                    Accelerometer.Default.Start(SensorSpeed.UI);
-                }
-                else
-                {
-                    Accelerometer.Default.Stop();
-                    Accelerometer.Default.ReadingChanged -= Accelerometer_ReadingChanged;
-                }
-            }
-        }
+                ActionId = (int)action,
+                UserId = MainViewModel.USER_ID,
+                Latitude = location.Latitude,
+                Longitude = location.Longitude,
+                Speed = location.Speed??0
+            };
 
-        static void Accelerometer_ReadingChanged(object sender, AccelerometerChangedEventArgs e)
-        {
-            speed = (e.Reading.Acceleration) / (1000 / 3600);
+            ApiCalls.PUTRequest("PostNewRideAction", rideActions);
+
+            //using(var rdr = ApiCalls.PUTRequest("PostNewRideAction", rideActions))
+            //{
+            //    var result = rdr.ReadToEnd();
+            //}
+
+            MainViewModel mvm = new();
+            await mvm.GetOverviewItems(MainViewModel.USER_ID);
+
         }
     }
 
