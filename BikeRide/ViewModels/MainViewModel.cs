@@ -9,19 +9,38 @@ public class MainViewModel : BaseViewModel
 
     public MainViewModel()
     {
+        Task.Run(() => GetUserProfile(USER_ID)).Wait();
+        Task.Delay(500).Wait();
         Task.Run(() => GetOverviewItems(USER_ID)).Wait();
         Task.Delay(500).Wait();
         Task.Run(() => GetRidesHistory(USER_ID)).Wait();
     }
 
     #region Home Tab Code
-    public string ProfilePhotoSource { get; set; } = "dotnet_bot";
-    public string ProfileName { get; set; } = "Leonardo";
-    public string ProfileDetails { get; set; } = "Bike Ride Manager";
+    public string ProfilePhotoSource { get; set; } //= "dotnet_bot";
+    public string ProfileName { get; set; } //= "Leonardo";
+    public string ProfileDetails { get; set; } //= "Bike Ride Manager";
 
-    public int LeftTurns { get; set; } = 89;
-    public int AvgSpeed { get; set; } = 20;
-    public int RightTurns { get; set; } = 71;
+    public int LeftTurns { get; set; } //= 89;
+    public double AvgSpeed { get; set; } //= 20;
+    public int RightTurns { get; set; } //= 71;
+
+    public async Task GetUserProfile(int userId)
+    {
+        HttpResponseMessage res = await ApiCalls.GETResponse("GetRideActions", $"?UserId={userId}");
+        if (res.IsSuccessStatusCode)
+        {
+            var result = await res.Content.ReadAsStringAsync();
+            UserProfile up = JsonConvert.DeserializeObject<UserProfile>(result);
+
+            ProfilePhotoSource = up.ProfilePhoto;
+            ProfileName = up.Username;
+            ProfileDetails = up.ProfileDescription;
+            LeftTurns = up.LeftTurns;
+            RightTurns = up.RightTurns;
+            AvgSpeed = up.AvgSpeed;
+        }
+    }
 
     public List<OverviewItem> OverviewItems { get; set; }
 

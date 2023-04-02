@@ -2,7 +2,7 @@
 
 public class ApiCalls
 {
-    static string ApiBaseUrl = "https://delcamposupreme.com/br/br/";
+    static string ApiBaseUrl = "https://delcamposupreme.com/br/";
     public static async Task<HttpResponseMessage> GETResponse(string Url, string Parameters)
     {
         return await new HttpClient

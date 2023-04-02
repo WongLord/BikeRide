@@ -8,6 +8,12 @@ namespace BikeRide_API.Controllers;
 
 public class BikeRideController : ControllerBase
 {
+    [HttpGet("~/GetProfileInfo")]
+    public IActionResult GetProfileInfo(int UserId)
+    {
+        return Ok(SQL.ExecuteScalar($"SP_GetUserInfo {UserId}").ToString()); //JsonConvert.DeserializeObject<List<RideActions>>
+    }
+
     [HttpGet("~/GetRideActions")]
     public IActionResult GetRideActions(int UserId)
     {
