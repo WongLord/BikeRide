@@ -8,25 +8,19 @@ namespace BikeRide_API.Controllers;
 
 public class BikeRideController : ControllerBase
 {
-    [HttpGet("~/br/GetActions")]
-    public IActionResult GetActions()
-    {
-        return Ok(SQL.ExecuteScalar("select * from Actions FOR JSON AUTO").ToString()); //JsonConvert.DeserializeObject<List<Actions>>
-    }
-
-    [HttpGet("~/br/GetRideActions")]
+    [HttpGet("~/GetRideActions")]
     public IActionResult GetRideActions(int UserId)
     {
         return Ok(SQL.ExecuteScalar($"SP_GetRideActions {UserId}").ToString()); //JsonConvert.DeserializeObject<List<RideActions>>
     }
 
-    [HttpGet("~/br/GetRideLocPoints")]
+    [HttpGet("~/GetRideLocPoints")]
     public IActionResult GetRideLocPoints(int UserId)
     {
         return Ok(SQL.ExecuteScalar($"SP_GetRidesLocationPoints {UserId}").ToString()); //JsonConvert.DeserializeObject<List<RideLocationPoints>>
     }
 
-    [HttpPost("~/br/PostNewRide")]
+    [HttpPost("~/PostNewRide")]
     public IActionResult PostNewRide([FromBody] Rides ride)
     {
         try
@@ -39,7 +33,7 @@ public class BikeRideController : ControllerBase
         }
     }
 
-    [HttpPost("~/br/PostNewRideAction")]
+    [HttpPost("~/PostNewRideAction")]
     public IActionResult PostNewRideAction([FromBody] RideActions action)
     {
         try
@@ -53,7 +47,7 @@ public class BikeRideController : ControllerBase
         }
     }
 
-    [HttpPost("~/br/PostLocPoint")]
+    [HttpPost("~/PostLocPoint")]
     public IActionResult PostLocPoint([FromBody] RideLocationPoints point)
     {
         try
