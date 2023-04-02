@@ -7,15 +7,6 @@ public class BaseViewModel : INotifyPropertyChanged
     BluetoothClient client = new();
     BluetoothDeviceInfo device = null;
 
-    //public ObservableCollection<BluetoothDeviceInfo> DeviceList { get; set; }
-
-   // BluetoothDeviceInfo deviceSelected;
-    //public BluetoothDeviceInfo DeviceSelected
-    //{
-    //    get => deviceSelected;
-    //    set { deviceSelected = value; OnPropertyChanged(nameof(DeviceSelected)); }
-    //}
-
     bool isScanning;
     public bool IsScanning
     {
@@ -29,13 +20,6 @@ public class BaseViewModel : INotifyPropertyChanged
         get => isConnected;
         set { isConnected = value; OnPropertyChanged(nameof(IsConnected)); }
     }
-
-    //bool isDeviceListEmpty;
-    //public bool IsDeviceListEmpty
-    //{
-    //    get => isDeviceListEmpty;
-    //    set { isDeviceListEmpty = value; OnPropertyChanged(nameof(IsDeviceListEmpty)); }
-    //}
 
     public ICommand CmdToggleConnection { get; set; }
 
@@ -55,6 +39,54 @@ public class BaseViewModel : INotifyPropertyChanged
         CmdSend2 = new Command(async () => await SendData("2"));
 
         //Task.Run(async () => await DiscoverDevices());
+    }
+
+    async Task ToggleConnection()
+    {
+        try
+        {
+            PermissionStatus permissionStatus = await CheckBluetoothPermissions();
+            if (permissionStatus != PermissionStatus.Granted)
+            {
+                permissionStatus = await RequestBluetoothPermissions();
+                if (permissionStatus != PermissionStatus.Granted)
+                {
+                    await Shell.Current.DisplayAlert($"Bluetooth LE permissions", $"Bluetooth LE permissions are not granted.", "OK");
+                    return;
+                }
+            }
+
+            if (IsConnected)
+            {
+                client.Close();
+                IsConnected = false;
+            }
+            else
+            {
+                IsScanning = true;
+
+                await Task.Run(() =>
+                {
+                    BluetoothAddress bta = new(Convert.ToUInt64("00220901163A", 16));
+                    client.Connect(bta, BluetoothService.SerialPort);
+                    //DeviceSelected = device;
+                    //IsDeviceListEmpty = false;
+                    IsScanning = false;
+
+
+                    Thread tr = new(ReceiveData);
+                    tr.IsBackground = true;
+                    tr.Start();
+                });
+
+                IsConnected = client.Connected;
+
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
     }
 
     private async Task SendData(string data)
@@ -172,53 +204,7 @@ public class BaseViewModel : INotifyPropertyChanged
     //    }
     //}
 
-    async Task ToggleConnection()
-    {
-        try
-        {
-            PermissionStatus permissionStatus = await CheckBluetoothPermissions();
-            if (permissionStatus != PermissionStatus.Granted)
-            {
-                permissionStatus = await RequestBluetoothPermissions();
-                if (permissionStatus != PermissionStatus.Granted)
-                {
-                    await Shell.Current.DisplayAlert($"Bluetooth LE permissions", $"Bluetooth LE permissions are not granted.", "OK");
-                    return;
-                }
-            }
-
-            if (IsConnected)
-            {
-                client.Close();
-                IsConnected = false;
-            }
-            else
-            {
-                IsScanning = true;
-
-                await Task.Run(() =>
-                {
-                    BluetoothAddress bta = new(Convert.ToUInt64("00220901163A", 16));
-                    client.Connect(bta, BluetoothService.SerialPort);
-                    //DeviceSelected = device;
-                    //IsDeviceListEmpty = false;
-                    IsScanning = false;
-
-
-                    Thread tr = new(ReceiveData);
-                    tr.IsBackground = true;
-                    tr.Start();
-                });
-
-                IsConnected = client.Connected;
-
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(ex.Message);
-        }
-    }
+    
 
     #region INotifyPropertyChanged Implementation
     public event PropertyChangedEventHandler PropertyChanged;
