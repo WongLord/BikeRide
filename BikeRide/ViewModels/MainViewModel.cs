@@ -27,11 +27,11 @@ public class MainViewModel : BaseViewModel
 
     public async Task GetUserProfile(int userId)
     {
-        HttpResponseMessage res = await ApiCalls.GETResponse("GetRideActions", $"?UserId={userId}");
+        HttpResponseMessage res = await ApiCalls.GETResponse("GetProfileInfo", $"?UserId={userId}");
         if (res.IsSuccessStatusCode)
         {
             var result = await res.Content.ReadAsStringAsync();
-            UserProfile up = JsonConvert.DeserializeObject<UserProfile>(result);
+            UserProfile up = JsonConvert.DeserializeObject<UserProfile>(result.Replace("[","").Replace("]",""));
 
             ProfilePhotoSource = up.ProfilePhoto;
             ProfileName = up.Username;

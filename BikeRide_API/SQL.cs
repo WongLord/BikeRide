@@ -22,4 +22,10 @@ public class SQL
         cmd.ExecuteNonQuery();
         Conn.Close();
     }
+
+    public static (SqlConnection Conn, SqlDataReader Reader) GetReader(string query)
+    {
+        Conn.Open(); //Needs to close Reader and Connection after use.
+        return (Conn, new SqlCommand(query, Conn).ExecuteReader());
+    }
 }
