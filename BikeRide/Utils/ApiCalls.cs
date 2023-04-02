@@ -15,7 +15,7 @@ public class ApiCalls
         }.GetAsync(Parameters);
     }
 
-    public static StreamReader PUTRequest(string method, object obj)
+    public static StreamReader POSTRequest(string method, object obj)
     {
         var httpRequest = (HttpWebRequest)WebRequest.Create(ApiBaseUrl + method);
         httpRequest.Method = "POST";
