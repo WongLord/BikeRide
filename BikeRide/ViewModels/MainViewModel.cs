@@ -1,14 +1,17 @@
-﻿namespace BikeRide.ViewModels;
+﻿using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
+
+namespace BikeRide.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-    private const int USER_ID = 1;
+    public const int USER_ID = 1;
     public MainViewModel()
     {
         //Rides.ForEach((p) => { p.MapCenter = p.GpsPoints[(p.GpsPoints.Count / 2) - 1]; });
 
         Task.Run(()=>GetOverviewItems(USER_ID)).Wait();
-        //Task.Delay(1000).Wait();
+        Task.Delay(500).Wait();
         Task.Run(() => GetRidesHistory(USER_ID)).Wait();
     }
 
@@ -31,18 +34,28 @@ public class MainViewModel : BaseViewModel
         if (res.IsSuccessStatusCode)
         {
             var result = await res.Content.ReadAsStringAsync();
-            List<RideActions> actions = JsonConvert.DeserializeObject<List<RideActions>>(result);
+            List<BikeRideActions> actions = JsonConvert.DeserializeObject<List<BikeRideActions>>(result);
             
 
-            actions.ForEach((a) => {
+            foreach(var a in actions)
+            {
+                string Road = "Could not find road.";
+                res = await ApiCalls.GETRoad(a.Latitude, a.Longitude);
+                if (res.IsSuccessStatusCode)
+                {
+                    var json = await res.Content.ReadAsStringAsync();
+                    JObject o = JObject.Parse(json);
+                    Road = (string)o.SelectToken("address.road");
+                }
+
                 items.Add(new OverviewItem
                 {
-                    IconSource = a.Actionname == "Turn Left" ? "turn_left": a.Actionname == "Turn Right" ? "turn_right":"stop_sign",
+                    IconSource = a.Actionname == "Turn Left" ? "turn_left" : a.Actionname == "Turn Right" ? "turn_right" : "stop_sign",
                     Title = a.Actionname,
-                    Details = $"You {a.Actionname} at {a.Latitude}, {a.Longitude}",
+                    Details = $"At {Road} road.",
                     Speed = a.Speed.ToString(".0#")
                 });
-            });
+            }
         }
         OverviewItems = items;
     }
