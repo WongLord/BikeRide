@@ -19,6 +19,9 @@ public partial class MainViewModel : BaseViewModel
         Updates = new();
         _locationService = new();
 
+        IsBtnEnabled = true;
+        IsNotBtnEnabled = !IsBtnEnabled;
+
         Task.Run(() => GetUserProfile(USER_ID)).Wait();
         Task.Delay(500).Wait();
         Task.Run(() => GetOverviewItems(USER_ID)).Wait();
@@ -27,13 +30,30 @@ public partial class MainViewModel : BaseViewModel
     }
 
     #region Home Tab Code
-    public string ProfilePhotoSource { get; set; } //= "dotnet_bot";
-    public string ProfileName { get; set; } //= "Leonardo";
-    public string ProfileDetails { get; set; } //= "Bike Ride Manager";
+    public string ProfilePhotoSource { get; set; } 
+    public string ProfileName { get; set; } 
+    public string ProfileDetails { get; set; } 
 
-    public int LeftTurns { get; set; } //= 89;
-    public string AvgSpeed { get; set; } //= 20;
-    public int RightTurns { get; set; } //= 71;
+    int _leftTurns;
+    public int LeftTurns 
+    { 
+        get =>_leftTurns;
+        set { _leftTurns = value; OnPropertyChanged(nameof(LeftTurns)); }
+    }
+
+    string _avgSpeed;
+    public string AvgSpeed 
+    {
+        get => _avgSpeed;
+        set { _avgSpeed = value; OnPropertyChanged(nameof(AvgSpeed)); } 
+    }
+
+    int _rightTurns;
+    public int RightTurns 
+    { 
+        get => _rightTurns;
+        set { _rightTurns = value; OnPropertyChanged(nameof(RightTurns)); } 
+    }
 
     public async Task GetUserProfile(int userId)
     {
@@ -51,8 +71,12 @@ public partial class MainViewModel : BaseViewModel
             AvgSpeed = up.AvgSpeed.ToString("0.#");
         }
     }
-
-    public List<OverviewItem> OverviewItems { get; set; }
+    public List<OverviewItem> _overviewItems;
+    public List<OverviewItem> OverviewItems 
+    { 
+        get => _overviewItems;
+        set { _overviewItems = value; OnPropertyChanged(nameof(OverviewItems)); }
+    }
 
     public async Task GetOverviewItems(int userId)
     {
@@ -92,8 +116,28 @@ public partial class MainViewModel : BaseViewModel
     #endregion
 
     #region Rides Tab Code
+
+    bool isBtnEnabled;
+    public bool IsBtnEnabled
+    {
+        get => isBtnEnabled;
+        set { isBtnEnabled = value; OnPropertyChanged(nameof(IsBtnEnabled)); }
+    }
+
+    bool isNotBtnEnabled;
+    public bool IsNotBtnEnabled
+    {
+        get => isNotBtnEnabled;
+        set { isNotBtnEnabled = value; OnPropertyChanged(nameof(IsNotBtnEnabled)); }
+    }
+
     public static int RideId { get; set; } = 0;
-    public List<RidesHistory> Rides { get; set; }
+
+    List<RidesHistory> _ridesHistory;
+    public List<RidesHistory> Rides { 
+        get => _ridesHistory;
+        set { _ridesHistory = value; OnPropertyChanged(nameof(Rides)); } 
+    }
 
     public async Task GetRidesHistory(int userId)
     {
@@ -155,6 +199,8 @@ public partial class MainViewModel : BaseViewModel
 
     public void StartLocationUpdates()
     {
+        IsBtnEnabled = false;
+        IsNotBtnEnabled = !IsBtnEnabled;
         Rides ride = new() { UserId = USER_ID, ActionId = (int)BikeAction.NewRide };
         using (var rdr = ApiCalls.POSTRequest("PostNewRide", ride))
         {
@@ -189,6 +235,8 @@ public partial class MainViewModel : BaseViewModel
             RideId = 0;
 
             await GetRidesHistory(USER_ID);
+            IsBtnEnabled = true;
+            IsNotBtnEnabled = !IsBtnEnabled;
         }
         catch(Exception ex)
         {

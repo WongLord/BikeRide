@@ -28,8 +28,8 @@
     </ContentPage.Resources>
     
     <ContentPage.Content>
-        <tabView:SfTabView x:Name="tabView" TabBarPlacement="Bottom">
-            <tabView:SfTabView.Items TabImagePosition="Top" >
+        <tabView:SfTabView x:Name="tabView" TabBarPlacement="Bottom" IndicatorPlacement="Top">
+            <tabView:SfTabView.Items TabImagePosition="Left" >
                 
                 <!--HOME TAB-->
                 <tabView:SfTabItem ImageSource="home.png" >
@@ -116,10 +116,14 @@
                     <tabView:SfTabItem.Content>
                         <ScrollView>
                             <Grid RowDefinitions="80,*" RowSpacing="15" Padding="30,25,30,0">
-                                <HorizontalStackLayout Grid.Row="0" Spacing="10">
-                                    <Button Grid.Column="0" Text="Start New Ride" FontSize="Medium" Command="{Binding CmdNewRide}" HorizontalOptions="Start" TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />
-                                    <Button Grid.Column="1" Text="Stop Ride" FontSize="Medium" Command="{Binding CmdStopRide}" HorizontalOptions="End" TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />
-                                </HorizontalStackLayout>
+                                <VerticalStackLayout Grid.Row="0" Spacing="10">
+                                    <Grid RowDefinitions="80" ColumnDefinitions="*,Auto" ColumnSpacing="15" Padding="0,0,0,0">
+                                        <Button Grid.Column="0" Text="Start Ride" WidthRequest="150" FontSize="Large" Command="{Binding CmdNewRide}" 
+                                                IsEnabled="{Binding IsBtnEnabled}" HorizontalOptions="Start" TextColor="White" BackgroundColor="#77D4FC" Margin="0,5,0,0" />
+                                        <Button Grid.Column="1" Text="Stop Ride" WidthRequest="150" FontSize="Large" Command="{Binding CmdStopRide}" 
+                                                IsEnabled="{Binding IsNotBtnEnabled}" HorizontalOptions="End" TextColor="White" BackgroundColor="#77D4FC" Margin="0,5,0,0" />
+                                    </Grid>
+                                </VerticalStackLayout>
                                 
                                 <VerticalStackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Rides, Mode=TwoWay}" Spacing="10">
                                     <BindableLayout.ItemTemplate>
@@ -167,9 +171,6 @@
 
                         <Grid>
                             <Grid RowSpacing="10" Padding="20" RowDefinitions="Auto,Auto,Auto,*,Auto">
-
-                                <Label Grid.Row="2" Text="Current Bluetooth Status:" TextColor="Black" FontSize="Medium" Margin="0,5" />
-
                                 <Frame Grid.Row="3" BackgroundColor="#23ABE3" HasShadow="False" Padding="10" BorderColor="Transparent">
                                     <Grid>
                                         <StackLayout Spacing="10" VerticalOptions="Center">
