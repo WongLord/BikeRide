@@ -1,4 +1,4 @@
-﻿namespace BikeRide_API.Model;
+﻿namespace BikeRide.Models;
 
 public class RideLocationPoints
 {

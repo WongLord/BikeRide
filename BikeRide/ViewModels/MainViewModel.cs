@@ -1,14 +1,24 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Newtonsoft.Json.Linq;
 using System.Text.Json.Nodes;
 
 namespace BikeRide.ViewModels;
 
-public class MainViewModel : BaseViewModel
+public partial class MainViewModel : BaseViewModel
 {
     public const int USER_ID = 1;
+    public ICommand CmdNewRide { get; set; }
+    public ICommand CmdStopRide { get; set; }
 
     public MainViewModel()
     {
+        CmdNewRide = new Command(() => StartLocationUpdates());
+        CmdStopRide = new Command(() => StopLocationUpdates());
+
+        Updates = new();
+        _locationService = new();
+
         Task.Run(() => GetUserProfile(USER_ID)).Wait();
         Task.Delay(500).Wait();
         Task.Run(() => GetOverviewItems(USER_ID)).Wait();
@@ -22,7 +32,7 @@ public class MainViewModel : BaseViewModel
     public string ProfileDetails { get; set; } //= "Bike Ride Manager";
 
     public int LeftTurns { get; set; } //= 89;
-    public double AvgSpeed { get; set; } //= 20;
+    public string AvgSpeed { get; set; } //= 20;
     public int RightTurns { get; set; } //= 71;
 
     public async Task GetUserProfile(int userId)
@@ -31,14 +41,14 @@ public class MainViewModel : BaseViewModel
         if (res.IsSuccessStatusCode)
         {
             var result = await res.Content.ReadAsStringAsync();
-            UserProfile up = JsonConvert.DeserializeObject<UserProfile>(result.Replace("[","").Replace("]",""));
+            UserProfile up = JsonConvert.DeserializeObject<UserProfile>(result.Replace("[", "").Replace("]", ""));
 
             ProfilePhotoSource = up.ProfilePhoto;
             ProfileName = up.Username;
             ProfileDetails = up.ProfileDescription;
             LeftTurns = up.LeftTurns;
             RightTurns = up.RightTurns;
-            AvgSpeed = up.AvgSpeed;
+            AvgSpeed = up.AvgSpeed.ToString("0.#");
         }
     }
 
@@ -53,9 +63,9 @@ public class MainViewModel : BaseViewModel
         {
             var result = await res.Content.ReadAsStringAsync();
             List<BikeRideActions> actions = JsonConvert.DeserializeObject<List<BikeRideActions>>(result);
-            
 
-            foreach(var a in actions)
+
+            foreach (var a in actions)
             {
                 string Road = "Could not find road.";
                 res = await ApiCalls.GETRoad(a.Latitude, a.Longitude);
@@ -70,22 +80,25 @@ public class MainViewModel : BaseViewModel
                 {
                     IconSource = a.Actionname == "Turn Left" ? "turn_left" : a.Actionname == "Turn Right" ? "turn_right" : "stop_sign",
                     Title = a.Actionname,
-                    Details = $"At {Road} road.",
-                    Speed = a.Speed.ToString(".0#")
+                    Details = $"At {Road}{(Road.ToLower().Contains("calle") || Road.ToLower().Contains("avenida") ? "." : " road.")}",
+                    Speed = a.Speed.ToString("0.#"),
+                    ActionDate = a.ActionDate.ToString("d") == DateTime.Now.ToString("d") ? a.ActionDate.ToString("t") : a.ActionDate.ToString("g")
                 });
             }
         }
+        items.Reverse();
         OverviewItems = items;
     }
     #endregion
 
     #region Rides Tab Code
-    public List<RidesHistory> Rides { get; set; } 
+    public static int RideId { get; set; } = 0;
+    public List<RidesHistory> Rides { get; set; }
 
     public async Task GetRidesHistory(int userId)
     {
         List<RidesHistory> _rides = new();
-    
+
         HttpResponseMessage res = await ApiCalls.GETResponse("GetRideLocPoints", $"?UserId={userId}");
         if (res.IsSuccessStatusCode)
         {
@@ -117,9 +130,78 @@ public class MainViewModel : BaseViewModel
                 _rides.ForEach((p) => { p.MapCenter = p.GpsPoints[(p.GpsPoints.Count / 2) - 1]; });
             }
         }
-
+        _rides.Reverse();
         Rides = _rides;
     }
+
+    #region Codigo para tomar la ubicacion continuamente para los Rides
+    private readonly Services.LocationService _locationService;
+
+    bool _locationUpdatesEnabled;
+    public bool LocationUpdatesEnabled
+    {
+        get => _locationUpdatesEnabled;
+        set { _locationUpdatesEnabled = value; OnPropertyChanged(nameof(LocationUpdatesEnabled)); }
+    }
+    public ObservableCollection<object> Updates { get; }
+    public void ChangeLocationUpdates()
+    {
+        LocationUpdatesEnabled = !LocationUpdatesEnabled;
+        if (LocationUpdatesEnabled)
+            StartLocationUpdates();
+        else
+            StopLocationUpdates();
+    }
+
+    public void StartLocationUpdates()
+    {
+        Rides ride = new() { UserId = USER_ID, ActionId = (int)BikeAction.NewRide };
+        using (var rdr = ApiCalls.POSTRequest("PostNewRide", ride))
+        {
+            RideId = Convert.ToInt32(rdr.ReadToEnd());
+        }
+
+        _locationService.LocationChanged += LocationService_LocationChanged;
+        _locationService.Initialize();
+    }
+
+    public async void StopLocationUpdates()
+    {
+        _locationService.Stop();
+        _locationService.LocationChanged -= LocationService_LocationChanged;
+
+        try
+        {
+            Rides ride = new() { RideId = RideId, EndDateTime = DateTime.Now };
+            ApiCalls.POSTRequest("EndRide", ride);
+
+            List<RideCoordinates> points = new();
+            foreach (var l in Updates)
+            {
+                var p = l as LocationModel;
+                points.Add(new RideCoordinates { Latitude = p.Latitude, Longitude = p.Longitude });
+            }
+
+            RideLocationPoints rlp = new() { RideId = RideId, RideCoordinates = points };
+            ApiCalls.POSTRequest("PostLocPoint", rlp);
+
+            Updates.Clear();
+            RideId = 0;
+
+            await GetRidesHistory(USER_ID);
+        }
+        catch(Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("Error", $"{ex.Message}\n\n{ex.InnerException}", "Ok");
+        }
+    }
+
+    private void LocationService_LocationChanged(object sender, Models.LocationModel e)
+    {
+        if (e.Latitude != 0 && e.Longitude != 0)
+            Updates.Add(e);
+    }
+    #endregion
     #endregion
 
     #region Settings Bluetooh Tab Code

@@ -131,7 +131,7 @@ public class BaseViewModel : INotifyPropertyChanged
         {
             GeolocationRequest request = new(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
             Location location = await Geolocation.Default.GetLocationAsync(request, new CancellationTokenSource().Token);
-
+            
             RideActions rideActions = new()
             {
                 ActionId = (int)action,
@@ -143,10 +143,6 @@ public class BaseViewModel : INotifyPropertyChanged
 
             ApiCalls.POSTRequest("PostNewRideAction", rideActions);
 
-            //using(var rdr = ApiCalls.PUTRequest("PostNewRideAction", rideActions))
-            //{
-            //    var result = rdr.ReadToEnd();
-            //}
 
             MainViewModel mvm = new();
             await mvm.GetOverviewItems(MainViewModel.USER_ID);

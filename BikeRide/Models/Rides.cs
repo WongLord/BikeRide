@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace BikeRide_API.Model;
+﻿namespace BikeRide.Models;
 
 public class Rides
 {

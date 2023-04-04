@@ -17,13 +17,32 @@ public class BikeRideController : ControllerBase
     [HttpGet("~/GetRideActions")]
     public IActionResult GetRideActions(int UserId)
     {
-        return Ok(SQL.ExecuteScalar($"SP_GetRideActions {UserId}").ToString()); //JsonConvert.DeserializeObject<List<RideActions>>
+        return Ok(GetJsonList($"SP_GetRideActions {UserId}")); //JsonConvert.DeserializeObject<List<RideActions>>
     }
 
     [HttpGet("~/GetRideLocPoints")]
     public IActionResult GetRideLocPoints(int UserId)
     {
-        return Ok(SQL.ExecuteScalar($"SP_GetRidesLocationPoints {UserId}").ToString()); //JsonConvert.DeserializeObject<List<RideLocationPoints>>
+
+        return Ok(GetJsonList($"SP_GetRidesLocationPoints {UserId}")); //JsonConvert.DeserializeObject<List<RideLocationPoints>>
+    }
+
+    private static string GetJsonList(string query)
+    {
+        var (conn, rdr) = SQL.GetReader(query);
+
+        string result = "[";
+        while (rdr.Read())
+        {
+            result += $"{rdr[0]},";
+        }
+        rdr.Close();
+        result = result[..^1];
+        result += "]";
+
+        conn.Close();
+
+        return result;
     }
 
     [HttpPost("~/PostNewRide")]
@@ -32,6 +51,20 @@ public class BikeRideController : ControllerBase
         try
         {
             return Ok(SQL.ExecuteScalar($"SP_InNewRide {ride.UserId}, {ride.ActionId}"));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("~/EndRide")]
+    public IActionResult EndRide([FromBody] Rides ride)
+    {
+        try
+        {
+            SQL.ExecuteQuery($"SP_UpStopRide {ride.RideId}, '{ride.EndDateTime}'");
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -54,11 +87,13 @@ public class BikeRideController : ControllerBase
     }
 
     [HttpPost("~/PostLocPoint")]
-    public IActionResult PostLocPoint([FromBody] RideLocationPoints point)
+    public IActionResult PostLocPoint([FromBody] RideLocationPoints Rlp)
     {
         try
         {
-            SQL.ExecuteQuery($"SP_InLocationPoint {point.RideId}, {point.Latitude}, {point.Longitude}");
+            foreach (var point in Rlp.RideCoordinates)
+                SQL.ExecuteQuery($"SP_InLocationPoint {Rlp.RideId}, {point.Latitude}, {point.Longitude}");
+
             return Ok();
         }
         catch (Exception ex)

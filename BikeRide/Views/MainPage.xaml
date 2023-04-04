@@ -87,12 +87,18 @@
                                                     <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource SeconaryBackground}">
                                                         <Image Source="{Binding IconSource}" HeightRequest="36" />
                                                     </Border>
+                                                    
                                                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                                                         <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" />
                                                         <Label Text="{Binding Details}" FontSize="12" />
                                                     </VerticalStackLayout>
 
-                                                    <Label Grid.Column="3" Text="{Binding Speed, StringFormat='{0} km/h'}" FontAttributes="Bold" VerticalOptions="Center" />
+                                                    <VerticalStackLayout Grid.Column="3" VerticalOptions="Center" HorizontalOptions="End">
+                                                        <Label Text="{Binding Speed, StringFormat='{0} km/h'}" FontAttributes="Bold" VerticalOptions="Center"  HorizontalOptions="End"/>
+                                                        <Label Text="{Binding ActionDate}" FontSize="11" />
+                                                    </VerticalStackLayout>
+
+                                                   
                                                 </Grid>
 
                                             </Border>
@@ -104,13 +110,18 @@
 
                     </tabView:SfTabItem.Content>
                 </tabView:SfTabItem>
+                
                 <!--RIDES TAB-->
                 <tabView:SfTabItem ImageSource="bike.png">
                     <tabView:SfTabItem.Content>
                         <ScrollView>
-                            <Grid RowDefinitions="*" RowSpacing="15" Padding="30,25,30,0">
-
-                                <VerticalStackLayout Grid.Row="0" BindableLayout.ItemsSource="{Binding Rides, Mode=TwoWay}" Spacing="10">
+                            <Grid RowDefinitions="80,*" RowSpacing="15" Padding="30,25,30,0">
+                                <HorizontalStackLayout Grid.Row="0" Spacing="10">
+                                    <Button Grid.Column="0" Text="Start New Ride" FontSize="Medium" Command="{Binding CmdNewRide}" HorizontalOptions="Start" TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />
+                                    <Button Grid.Column="1" Text="Stop Ride" FontSize="Medium" Command="{Binding CmdStopRide}" HorizontalOptions="End" TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />
+                                </HorizontalStackLayout>
+                                
+                                <VerticalStackLayout Grid.Row="1" BindableLayout.ItemsSource="{Binding Rides, Mode=TwoWay}" Spacing="10">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate>
                                             <Border StrokeThickness="0" HeightRequest="250">
@@ -149,6 +160,7 @@
                         </ScrollView>
                     </tabView:SfTabItem.Content>
                 </tabView:SfTabItem>
+                
                 <!--SETTINGS TAB-->
                 <tabView:SfTabItem ImageSource="settings">
                     <tabView:SfTabItem.Content>
