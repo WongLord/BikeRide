@@ -13,8 +13,9 @@ public static class MauiProgram
 			.ConfigureSyncfusionCore()
 			.ConfigureFonts(fonts =>
 			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+				fonts.AddFont("bike-ride-titillium-web-regular", "BikeRideFont");
+				//fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+				//fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			})
 			.UseMauiCommunityToolkit();
 

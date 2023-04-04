@@ -146,6 +146,7 @@ public class BaseViewModel : INotifyPropertyChanged
 
             MainViewModel mvm = new();
             await mvm.GetOverviewItems(MainViewModel.USER_ID);
+            await mvm.GetUserProfile(MainViewModel.USER_ID);
 
         }
     }
