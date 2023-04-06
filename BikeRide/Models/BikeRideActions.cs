@@ -2,6 +2,7 @@
 
 public class BikeRideActions
 {
+    public int RideActionId { get; set; }
     public DateTime ActionDate { get; set; }
     public string Username { get; set; }
     public string Actionname { get; set; }

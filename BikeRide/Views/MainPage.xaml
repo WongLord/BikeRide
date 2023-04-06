@@ -75,7 +75,7 @@
                                 </Grid>
 
                                 <!-- Overview items. -->
-                                <VerticalStackLayout Grid.Row="2" BindableLayout.ItemsSource="{Binding OverviewItems,Mode=TwoWay}" Spacing="18">
+                                <VerticalStackLayout Grid.Row="2" BindableLayout.ItemsSource="{Binding OverviewItems, Mode=TwoWay}" Spacing="18">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate>
                                             <Border StrokeThickness="0" StrokeShape="RoundRectangle 25" HeightRequest="80">
@@ -97,8 +97,6 @@
                                                         <Label Text="{Binding Speed, StringFormat='{0} km/h'}" FontAttributes="Bold" VerticalOptions="Center"  HorizontalOptions="End"/>
                                                         <Label Text="{Binding ActionDate}" FontSize="11" />
                                                     </VerticalStackLayout>
-
-                                                   
                                                 </Grid>
 
                                             </Border>
@@ -174,21 +172,10 @@
                                 <Frame Grid.Row="3" BackgroundColor="#23ABE3" HasShadow="False" Padding="10" BorderColor="Transparent">
                                     <Grid>
                                         <StackLayout Spacing="10" VerticalOptions="Center">
-                                            <!--<Label Grid.Row="0" Text="Temperature" FontSize="35"
-                                TextColor="White" HorizontalOptions="Center" VerticalOptions="End" />-->
-
                                             <Grid Grid.Column="1" WidthRequest="200" HeightRequest="200">
                                                 <Button Command="{Binding CmdToggleConnection}" BackgroundColor="Transparent" CornerRadius="5" />
                                                 <Image Margin="10" HorizontalOptions="Center" VerticalOptions="Center" Source="icon_connected">
                                                     <Image.Triggers>
-                                                        <DataTrigger TargetType="Image" Binding="{Binding IsDeviceListEmpty}" Value="True">
-                                                            <Setter Property="Opacity" Value="0.5" />
-                                                            <Setter Property="InputTransparent" Value="False" />
-                                                        </DataTrigger>
-                                                        <DataTrigger TargetType="Image" Binding="{Binding IsDeviceListEmpty}" Value="False">
-                                                            <Setter Property="Opacity" Value="1" />
-                                                            <Setter Property="InputTransparent" Value="True" />
-                                                        </DataTrigger>
                                                         <DataTrigger TargetType="Image" Binding="{Binding IsScanning}" Value="True">
                                                             <Setter Property="IsVisible" Value="False" />
                                                             <Setter Property="InputTransparent" Value="False" />
@@ -217,15 +204,15 @@
                                                     </Binding>
                                                 </Label.Text>
                                             </Label>
-                                    
 
-                                    
+
+
 
                                             <Button Grid.Row="2" Text="Turn On" FontSize="Medium"
                                 Command="{Binding CmdSend1}" VerticalOptions="Start"
                                 TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />
-                                            
-                                            
+
+
                                             <Button Grid.Row="3" Text="Turn Off" FontSize="Medium"
                                 Command="{Binding CmdSend2}" VerticalOptions="Start"
                                 TextColor="White" BackgroundColor="#EF7D3B" Margin="0,5,0,0" />

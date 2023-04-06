@@ -4,8 +4,8 @@ namespace BikeRide.ViewModels;
 
 public class BaseViewModel : INotifyPropertyChanged
 {
-    BluetoothClient client = new();
-    BluetoothDeviceInfo device = null;
+    private const string BLUETOOTH_DEVICE = "00220901163A";
+    BluetoothClient client;
 
     bool isScanning;
     public bool IsScanning
@@ -45,16 +45,9 @@ public class BaseViewModel : INotifyPropertyChanged
     {
         try
         {
-            PermissionStatus permissionStatus = await CheckBluetoothPermissions();
-            if (permissionStatus != PermissionStatus.Granted)
-            {
-                permissionStatus = await RequestBluetoothPermissions();
-                if (permissionStatus != PermissionStatus.Granted)
-                {
-                    await Shell.Current.DisplayAlert($"Bluetooth LE permissions", $"Bluetooth LE permissions are not granted.", "OK");
-                    return;
-                }
-            }
+            await CheckPermissions();
+
+            client = new(); //Bluetooth Client Initialization
 
             if (IsConnected)
             {
@@ -67,19 +60,18 @@ public class BaseViewModel : INotifyPropertyChanged
 
                 await Task.Run(() =>
                 {
-                    BluetoothAddress bta = new(Convert.ToUInt64("00220901163A", 16));
+                    BluetoothAddress bta = new(Convert.ToUInt64(BLUETOOTH_DEVICE, 16));
                     client.Connect(bta, BluetoothService.SerialPort);
-                    //DeviceSelected = device;
-                    //IsDeviceListEmpty = false;
                     IsScanning = false;
 
-
-                    Thread tr = new(ReceiveData);
-                    tr.IsBackground = true;
+                    Thread tr = new(ReceiveData)
+                    {
+                        IsBackground = true
+                    };
                     tr.Start();
                 });
 
-                IsConnected = client.Connected;
+                IsConnected = true;
 
             }
         }
@@ -95,12 +87,8 @@ public class BaseViewModel : INotifyPropertyChanged
         StreamWriter sw = new(stream, System.Text.Encoding.ASCII);
         await sw.WriteLineAsync(data);
         sw.Flush();
-        //sw.Close();
-
-        //client.Connect(device.DeviceAddress, BluetoothService.SerialPort);
     }
 
-   //static System.Numerics.Vector3 speed;
     private async void ReceiveData()
     {
         var stream = client.GetStream();
@@ -147,7 +135,6 @@ public class BaseViewModel : INotifyPropertyChanged
             MainViewModel mvm = new();
             await mvm.GetOverviewItems(MainViewModel.USER_ID);
             await mvm.GetUserProfile(MainViewModel.USER_ID);
-
         }
     }
 
@@ -212,7 +199,21 @@ public class BaseViewModel : INotifyPropertyChanged
     #endregion
 
     #region Permisos
-    public async Task<PermissionStatus> CheckBluetoothPermissions()
+    public async Task CheckPermissions()
+    {
+        PermissionStatus permissionStatus = await CheckBluetoothPermissions();
+        if (permissionStatus != PermissionStatus.Granted)
+        {
+            permissionStatus = await RequestBluetoothPermissions();
+            if (permissionStatus != PermissionStatus.Granted)
+            {
+                await Shell.Current.DisplayAlert($"Bluetooth LE permissions", $"Bluetooth LE permissions are not granted.", "OK");
+                return;
+            }
+        }
+    }
+
+    public static async Task<PermissionStatus> CheckBluetoothPermissions()
     {
         PermissionStatus status = PermissionStatus.Unknown;
         try
@@ -227,7 +228,7 @@ public class BaseViewModel : INotifyPropertyChanged
         return status;
     }
 
-    public async Task<PermissionStatus> RequestBluetoothPermissions()
+    public static async Task<PermissionStatus> RequestBluetoothPermissions()
     {
         PermissionStatus status = PermissionStatus.Unknown;
         try

@@ -91,23 +91,27 @@ public partial class MainViewModel : BaseViewModel
 
             foreach (var a in actions)
             {
-                string Road = "Could not find road.";
-                res = await ApiCalls.GETRoad(a.Latitude, a.Longitude);
-                if (res.IsSuccessStatusCode)
+                if (!OverviewItems.Any(i => i.RideActionId == a.RideActionId))
                 {
-                    var json = await res.Content.ReadAsStringAsync();
-                    JObject o = JObject.Parse(json);
-                    Road = (string)o.SelectToken("address.road");
-                }
+                    string Road = "Could not find road.";
+                    res = await ApiCalls.GETRoad(a.Latitude, a.Longitude);
+                    if (res.IsSuccessStatusCode)
+                    {
+                        var json = await res.Content.ReadAsStringAsync();
+                        JObject o = JObject.Parse(json);
+                        Road = (string)o.SelectToken("address.road");
+                    }
 
-                items.Add(new OverviewItem
-                {
-                    IconSource = a.Actionname == "Turn Left" ? "turn_left" : a.Actionname == "Turn Right" ? "turn_right" : "stop_sign",
-                    Title = a.Actionname,
-                    Details = $"At {Road}{(Road.ToLower().Contains("calle") || Road.ToLower().Contains("avenida") ? "." : " road.")}",
-                    Speed = a.Speed.ToString("0.#"),
-                    ActionDate = a.ActionDate.ToString("d") == DateTime.Now.ToString("d") ? a.ActionDate.ToString("t") : a.ActionDate.ToString("g")
-                });
+                    items.Add(new OverviewItem
+                    {
+                        RideActionId = a.RideActionId,
+                        IconSource = a.Actionname == "Turn Left" ? "turn_left" : a.Actionname == "Turn Right" ? "turn_right" : "stop_sign",
+                        Title = a.Actionname,
+                        Details = $"At {Road}{(Road.ToLower().Contains("calle") || Road.ToLower().Contains("avenida") ? "." : " road.")}",
+                        Speed = a.Speed.ToString("0.#"),
+                        ActionDate = a.ActionDate.ToString("d") == DateTime.Now.ToString("d") ? a.ActionDate.ToString("t") : a.ActionDate.ToString("g")
+                    });
+                }
             }
         }
         items.Reverse();
@@ -153,10 +157,13 @@ public partial class MainViewModel : BaseViewModel
 
             foreach (var g in groupedRides)
             {
+                
                 ObservableCollection<MapLatLng> Points = new();
                 DateTime _startDateTime = DateTime.Now;
+                int _rideId = 0;
                 g.ForEach((p) =>
                 {
+                    _rideId = p.RideId;
                     _startDateTime = p.StartDateTime;
                     Points.Add(new MapLatLng
                     {
@@ -165,11 +172,14 @@ public partial class MainViewModel : BaseViewModel
                     });
                 });
 
-                _rides.Add(new RidesHistory
+                if (!Rides.Any(r => r.RideId == _rideId))
                 {
-                    DateTime = _startDateTime,
-                    GpsPoints = Points
-                });
+                    _rides.Add(new RidesHistory
+                    {
+                        DateTime = _startDateTime,
+                        GpsPoints = Points
+                    });
+                }
 
                 _rides.ForEach((p) => { p.MapCenter = p.GpsPoints[(p.GpsPoints.Count / 2) - 1]; });
             }
@@ -197,8 +207,9 @@ public partial class MainViewModel : BaseViewModel
             StopLocationUpdates();
     }
 
-    public void StartLocationUpdates()
+    public async void StartLocationUpdates()
     {
+        await CheckPermissions();
         IsBtnEnabled = false;
         IsNotBtnEnabled = !IsBtnEnabled;
         Rides ride = new() { UserId = USER_ID, ActionId = (int)BikeAction.NewRide };

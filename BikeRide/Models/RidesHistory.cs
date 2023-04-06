@@ -9,6 +9,7 @@ namespace BikeRide.Models
 {
     public class RidesHistory
     {
+        public int RideId { get; set; }
         public DateTime DateTime { get; set; }
         public ObservableCollection<MapLatLng> GpsPoints { get; set; }
         public MapLatLng MapCenter { get; set; }
@@ -16,6 +17,7 @@ namespace BikeRide.Models
 
     public class RidesPoints
     {
+        public int RideId { get; set; }
         public DateTime StartDateTime { get; set; }
         public string Username { get; set; }
         public string Time { get; set; }

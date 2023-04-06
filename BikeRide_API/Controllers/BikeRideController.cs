@@ -1,8 +1,5 @@
 ﻿using BikeRide_API.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Text.Json.Serialization;
 
 namespace BikeRide_API.Controllers;
 

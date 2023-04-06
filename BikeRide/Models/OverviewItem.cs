@@ -8,6 +8,7 @@ namespace BikeRide.Models;
 
 public class OverviewItem
 {
+    public int RideActionId { get; set; }
     public string IconSource { get; set; }
     public string Title { get; set; }
     public string Details { get; set; }
