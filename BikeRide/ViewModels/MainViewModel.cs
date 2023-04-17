@@ -91,8 +91,8 @@ public partial class MainViewModel : BaseViewModel
 
             foreach (var a in actions)
             {
-                if (!OverviewItems.Any(i => i.RideActionId == a.RideActionId))
-                {
+                //if (!OverviewItems.Any(i => i.RideActionId == a.RideActionId))
+                //{
                     string Road = "Could not find road.";
                     res = await ApiCalls.GETRoad(a.Latitude, a.Longitude);
                     if (res.IsSuccessStatusCode)
@@ -111,7 +111,7 @@ public partial class MainViewModel : BaseViewModel
                         Speed = a.Speed.ToString("0.#"),
                         ActionDate = a.ActionDate.ToString("d") == DateTime.Now.ToString("d") ? a.ActionDate.ToString("t") : a.ActionDate.ToString("g")
                     });
-                }
+                //}
             }
         }
         items.Reverse();
@@ -172,14 +172,14 @@ public partial class MainViewModel : BaseViewModel
                     });
                 });
 
-                if (!Rides.Any(r => r.RideId == _rideId))
-                {
+                //if (!Rides.Any(r => r.RideId == _rideId))
+                //{
                     _rides.Add(new RidesHistory
                     {
                         DateTime = _startDateTime,
                         GpsPoints = Points
                     });
-                }
+                //}
 
                 _rides.ForEach((p) => { p.MapCenter = p.GpsPoints[(p.GpsPoints.Count / 2) - 1]; });
             }
